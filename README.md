@@ -7,4 +7,4 @@ Name  | Steven Chu
 
 ## About Me
 
-I am an MS in Analytics candidate at the University of San Francisco. Expecting to finish my coursework by the end of June 2015, I am currently seeking employment in the San Francisco Bay Area. Interests include healthcare, public policy, education, technology, social media, and entertainment.
+I am currently working towards my MS in Analytics degree at the University of San Francisco. I expect to finish my coursework by the end of June 2015. In addition to completing school, I am currently seeking employment in the San Francisco Bay Area. Potential fields of interest include healthcare, public policy, education, technology, social media, and entertainment.
