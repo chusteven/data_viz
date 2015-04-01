@@ -1,4 +1,4 @@
-# MSAN 622: Data Visualization
+# MSAN 622: Information Visualization
 
 Name  | Steven Chu
 --- | :---
@@ -7,4 +7,4 @@ Name  | Steven Chu
 
 # About Me
 
-Here is a bunch of bullshit about me.
+I am an MS in Analytics candidate at the University of San Francisco. Expecting to finish my coursework by the end of June 2014, I am currently seeking employment in the San Francisco Bay Area. Interests include healthcare, public policy, education, technology, social media, and entertainment.
