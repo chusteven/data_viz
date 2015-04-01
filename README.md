@@ -3,7 +3,7 @@
 Name  | Steven Chu
 --- | :---
 **Email** | stevenc1@gmail.com
-**Web** | http://chusteven.github.io/data_viz
+**Web** | http://chusteven.github.io/spring-2015-msan622
 
 ## About Me
 
