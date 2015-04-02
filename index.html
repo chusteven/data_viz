@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<!-- figure out what's up with this head class thing -->
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<!-- how does this title work? -->
 <title>MSAN 622 Information Visualization</title>
 
+<!-- what is a link class? -->
 <link href="css/bootstrap.min.css" rel="stylesheet">
 <link href="css/bootstrap-theme.min.css" rel="stylesheet">
 
+<!-- this is probably for the entire body thing? -->
 <style type="text/css">
     body {
         padding-top: 50px;
@@ -28,6 +32,7 @@
 <body>
 
 <!-- Fixed Navbar -->
+<!-- nav class is good for navigating the website on a high level... -->
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
@@ -40,6 +45,7 @@
             <a class="navbar-brand" href="#">MSN 622</a>
         </div>
 
+        <!-- an li object is a list object thing -->
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <li><a href="#homework">Homework</a></li>
@@ -47,6 +53,7 @@
                 <li><a href="#participation">Participation</a></li>
             </ul>
 
+            <!-- notice that this pushes these buttons to the right of the screen -->
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="#about">About</a></li>
                 <li><a href="#contact">Contact</a></li>
@@ -55,23 +62,33 @@
     </div>
 </nav>
 
+<!-- class called jumbotron is a particular template thingy in bootstrap package... -->
 <div class="jumbotron">
     <div class="container">
+    
+        <!-- this is the top header -->
         <h1>Information Visualization</h1>
-
+        
+        <!-- this is the content of the header -->
         <p>Welcome to my submission website for <a href="#">MSAN 622 Information Visualization</a> at the <a href="http://www.usfca.edu/">University of San Francisco</a>.</p>
 
+        <!-- this is yet another button referencing the "About Me" section -->
         <p><a class="btn btn-primary btn-lg" href="#about" role="button">About Me &raquo;</a></p>
     </div>
 </div>
 
+<!-- container is another class beneath the jumbotron thingy -->
 <div class="container">
 
+<!-- stylizing things within each of these classes, i'm supposing? -->
 <p style="text-align: center;">
     <svg id="demo" height="20" width="300"></svg>
 </p>
 
+<!-- prints a first row -->
 <div class="row">
+
+    <!-- these are each separate sections; look to see how they are being spaced apart -->
     <div class="col-md-4">
         <h2 class="page-header"><a name="homework"></a>Homework</h2>
 
@@ -105,35 +122,50 @@
     </div>
 </div>
 
+<!-- this is on the next row underneath jumbotron -->
 <div class="row">
+    <!-- why is this col-md-8 instead of col-md-4? -->
     <div class="col-md-8">
         <h2 class="page-header"><a name="about"></a>About Me</h2>
 
+        <!-- why is this class thing have to be what it is here? -->
         <div class="media">
+            <!-- why does it have to be underneath this first class? -->
             <div class="media-left">
+                <!-- what does href=# do? -->
                 <a href="#">
-                    <img class="media-object" src="images/pic.jpg" style="width: 106px; height: 144px;">
+                    <!-- class, source, style, etc. -->
+                    <img class="media-object" src="images/pic.jpg" style="width: 105px; height: 144px;">
                 </a>
             </div>
 
+            <!-- same thing... why does it have to be body here? how are things getting aligned? -->
             <div class="media-body">
                 <p>My name is Steven Chu, and I am currently working towards my MS in Analytics degree at the <a href="http://www.usfca.edu/">University of San Francisco</a>. I expect to finish my coursework by the end of June 2015. In addition to completing school, I am currently seeking employment in the San Francisco Bay Area. Potential fields of interest include healthcare, public policy, education, technology, social media, and entertainment.</p>
             </div>
         </div>
     </div>
 
+    <!-- back to col-md-4... -->
     <div class="col-md-4">
+        <!-- this is the header class, as well as creating links to aforementioned contact buttons?? -->
         <h2 class="page-header"><a name="contact"></a>Contact</h2>
 
+        <!-- creating table class -->
         <table class="table table-bordered" style="width: auto;">
+            <!-- why thread? -->
             <thead>
+                <!-- tr means a row? -->
                 <tr>
+                    <!-- th means... -->
                     <th colspan="2">Steven Chu</th>
                 </tr>
             </thead>
 
+            <!-- body different from thread? -->
             <tbody>
                 <tr>
+                    <!-- th versus td are two different objects... -->
                     <th>Github:</th>
                     <td><a href="https://github.com/chusteven/spring-2015-msan622">https://github.com/chusteven/spring-2015-msan622</a></td>
                 </tr>
@@ -154,18 +186,26 @@
 
 <hr/>
 
+<!-- this is neat because it provides a bottom thingy; wonder how to mess with the size or this somehow defaulted? -->
 <footer>
     <p style="text-align: center;">Steven Chu &bullet; MSAN 622 Information Visualization &bullet; Spring 2015</p>
 </footer>
 
 </div><!--/.container -->
 
+<!-- this calls on the JavaScript things necessary to run the whole damn thing! -->
+<!-- interesting that it's positioned at the bottom rather than at the top like an import statement... -->
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/d3.min.js"></script>
 
 <!-- STUDENTS: Remove this after verifying D3 is working. //-->
+
+<!-- 
 <script src="js/testD3.js"></script>
 <script>testD3("demo");</script>
 </body>
 </html>
+-->
+
+
