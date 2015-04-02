@@ -62,20 +62,24 @@
     </div>
 </nav>
 
-<h1 class="page-header">
-    Homework 1: Letter Count Bar Chart
-</h1>
+<!-- why a "container"? -->
+<div class="container">
 
-var originalQuery = decodeURI(window.location.search)
-var newQuery = originalQuery.substring(1, originalQuery.length)
+    <!-- why a "page-header"? -->
+    <h1 class="page-header">
+        
+        Homework 1: Letter Count Bar Chart
+    </h1>
 
-<div id="chart">
+    <div id="chart-area">
+        <h1>Chart Title</h1>
 
+        <!-- Chart will go in here -->
+        <div id="chart">
+
+        </div>
+    </div>
 </div>
-
-
-
-
 
 
 
@@ -92,6 +96,20 @@ var newQuery = originalQuery.substring(1, originalQuery.length)
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/d3.min.js"></script>
+
+<script>
+    var originalQuery = decodeURI(window.location.search)
+    var newQuery = originalQuery.substring(1, originalQuery.length)
+
+    var data =  [1, 2, 3, 4, 5, 10, 15]
+
+    var chart = d3.select("div#chart")
+
+    chart.data(data).enter().append("div")
+        .style("width", function(d) { return d * 10 + "px"; })
+        .text(function(d) { return d; })
+
+</script>
 
 <!-- STUDENTS: Remove this after verifying D3 is working. //-->
 
