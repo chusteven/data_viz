@@ -62,20 +62,19 @@
     </div>
 </nav>
 
-<h1 class="page-header">
-    Homework 1: Letter Count Bar Chart
-</h1>
+<!-- why a "container"? -->
+<div class="container">
 
-var originalQuery = decodeURI(window.location.search)
-var newQuery = originalQuery.substring(1, originalQuery.length)
+    <!-- why a "page-header"? -->
+    <h1 class="page-header">
+        
+        Homework 1: Letter Count Bar Chart
+    </h1>
 
-<div id="chart">
-
+    <div id="chart">
+        
+    </div>
 </div>
-
-
-
-
 
 
 
@@ -92,6 +91,29 @@ var newQuery = originalQuery.substring(1, originalQuery.length)
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/d3.min.js"></script>
+
+<script>
+    
+    // grabbing the actual query string
+    var originalQuery = decodeURI(window.location.search)
+
+    // getting rid of first character ("?"), and making all lowercase
+    var newQuery = originalQuery
+                        .substring(1, originalQuery.length)
+                        .toLowerCase()
+
+    // get rid of punctuation
+    // get rid of special characters
+    // get rid of spaces
+    
+    // creating dictionary type object
+    var dictionary = new Object()
+
+    for (var i in newQuery) {
+        dictionary[newQuery[i]] = 1
+    }
+
+</script>
 
 <!-- STUDENTS: Remove this after verifying D3 is working. //-->
 
