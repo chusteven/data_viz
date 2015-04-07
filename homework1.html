@@ -7,7 +7,6 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- how does this title work? -->
 <title>MSAN 622 Information Visualization</title>
 
 <!-- what is a link class? -->
@@ -31,8 +30,36 @@
 
 <body>
 
+<!-- this is defining the style for the objects we will have populating our page -->
+<style>
+
+.bar {
+  fill: steelblue
+}
+
+.bar:hover {
+  fill: brown
+}
+
+.axis {
+  font: 10px sans-serif
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges
+}
+
+.x.axis path {
+  display: none
+}
+
+</style>
+
+
 <!-- Fixed Navbar -->
-<!-- nav class is good for navigating the website on a high level... -->
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
@@ -62,39 +89,17 @@
     </div>
 </nav>
 
-<!-- why a "container"? -->
 <div class="container">
 
-    <!-- why a "page-header"? -->
     <h1 class="page-header">
-        
         Homework 1: Letter Count Bar Chart
     </h1>
 
-    <div id="chart">
-        
-    </div>
+    <svg class="chart"></svg>
+
 </div>
 
 
-    <!-- why a "page-header"? -->
-    <h1 class="page-header">
-        
-        Homework 1: Letter Count Bar Chart
-    </h1>
-
-    <div id="chart-area">
-        <h1>Chart Title</h1>
-
-        <!-- Chart will go in here -->
-        <div id="chart">
-
-        </div>
-    </div>
-</div>
-
-
-<!-- this is neat because it provides a bottom thingy; wonder how to mess with the size or this somehow defaulted? -->
 <footer>
     <p style="text-align: center;">Steven Chu &bullet; MSAN 622 Information Visualization &bullet; Spring 2015</p>
 </footer>
@@ -113,28 +118,146 @@
     // grabbing the actual query string
     var originalQuery = decodeURI(window.location.search)
 
-    // getting rid of first character ("?"), and making all lowercase
+    // making all lower case, getting rid of special characters/punctuation, and spaces
     var newQuery = originalQuery
-                        .substring(1, originalQuery.length)
                         .toLowerCase()
-
-    // get rid of punctuation
-    // get rid of special characters
-    // get rid of spaces
+                        .replace(/[\.\?,-\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+                        .replace(/\s/g, "")
     
     // creating dictionary type object
     var dictionary = new Object()
 
+    // storing letters of the query in that object
+    
     for (var i in newQuery) {
-        dictionary[newQuery[i]] = 1
+
+        // if not seen this value before, give inital value of 1
+        if (dictionary[newQuery[i]] == null) {
+            dictionary[newQuery[i]] = 1
+        }
+
+        // if seen this value, then add 1 to count
+        else {
+            dictionary[newQuery[i]] += 1   
+        }
+        
     }
 
-    var originalQuery = decodeURI(window.location.search)
-    var newQuery = originalQuery.substring(1, originalQuery.length)
+    var margin = {top: 20, right: 20, bottom: 30, left: 40},
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom
 
-    var data =  [1, 2, 3, 4, 5, 10, 15]
+    var x = d3.scale.ordinal()
+        .domain(Object.keys(dictionary))
+        .rangeRoundBands([0, width], .1)
 
-    var chart = d3.select("div#chart")
+    var y = d3.scale.linear()
+        .domain([0, d3.max(d3.values(dictionary))])
+        .range([height, 0])
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom")
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .ticks(10)
+
+    var chart = d3.select(".chart")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+    chart.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+
+    chart.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+      .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Count")
+
+    chart.selectAll(".bar")
+        .data(Object.keys(dictionary))
+      .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d) { return x(d) })
+        .attr("width", x.rangeBand())
+        .attr("y", function(d) { return y(dictionary[d]) })
+        .attr("height", function(d) { return height - y(dictionary[d]) })
+
+
+
+
+
+    /* this is a multi-line comment (!)
+
+    // example...
+
+    // defining data
+    var data = [4, 8, 15, 16, 23, 42]
+
+    // defining widths and bar heights
+    var width = 420, 
+        barHeight = 20
+
+    // defining x-scale
+    var x = d3.scale.linear()
+        .domain([0, d3.max(data)])
+        .range([0, 420])
+
+    // some chart things
+    var chart = d3.select(".chart")
+        .attr("width", width)
+        .attr("height", barHeight * data.length)
+
+    // actually creating the chart
+    var bar = chart.selectAll("g")
+        .data(data)
+          .enter().append("g")
+        .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; })
+
+    // some things to the bars
+    bar.append("rect")
+        .attr("x", 0)
+        .attr("width", x)
+        .attr("height", barHeight - 1)
+
+    // some more things to the bars
+    bar.append("text")
+        .attr("x", function(d) { return x(d) - 3; })
+        .attr("y", barHeight / 2)
+        .attr("dy", ".35em")
+        .text(function(d) { return d; })
+    
+    */
+
+
+
+
+
+    /*
+
+    // compare to:
+    actually creating the chart
+    d3.select(".chart")
+        .selectAll("div")
+          .data(data)
+        .enter().append("div")
+          .style("width", function(d) { return x(d) + "px"; })
+          .text(function(d) { return d; });
+          
+    */
+
+
 
 </script>
 
