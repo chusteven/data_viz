@@ -42,18 +42,19 @@
 }
 
 .axis {
-  font: 10px sans-serif
+  font: 15px sans-serif;
 }
 
 .axis path,
 .axis line {
   fill: none;
-  stroke: #000;
+  stroke: black; /* modify this value to change the color of the axes line */
+  stroke-width: 1px; /* modify these values to change the axis width */
   shape-rendering: crispEdges
 }
 
 .x.axis path {
-  display: none
+  display: none;
 }
 
 </style>
@@ -127,10 +128,10 @@
     // creating dictionary type object
     var dictionary = new Object()
 
-    // storing letters of the query in that object
-    
-    for (var i in newQuery) {
 
+    // storing letters of the query in that object
+    for (var i in newQuery) {
+        
         // if not seen this value before, give inital value of 1
         if (dictionary[newQuery[i]] == null) {
             dictionary[newQuery[i]] = 1
@@ -140,41 +141,52 @@
         else {
             dictionary[newQuery[i]] += 1   
         }
-        
     }
 
+    // setting margins
     var margin = {top: 20, right: 20, bottom: 30, left: 40},
         width = 960 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom
 
+    // creating x domain and range for origins of bars
     var x = d3.scale.ordinal()
         .domain(Object.keys(dictionary))
+        // note: here are three inputs: the domain, inner padding, outer padding
+        // note: the latter two inputs are in proportions (0.0-1.0) of the step size
         .rangeRoundBands([0, width], .1)
 
+    // creating y domain and range for origins of bars
     var y = d3.scale.linear()
         .domain([0, d3.max(d3.values(dictionary))])
         .range([height, 0])
 
+    // create axis, scale appropriately, put on bottom
     var xAxis = d3.svg.axis()
         .scale(x)
         .orient("bottom")
 
+    // create axis, scale appropriately, put on left
     var yAxis = d3.svg.axis()
         .scale(y)
         .orient("left")
-        .ticks(10)
+        .ticks(10) // tels how many ticks will actually be on display
+        .tickFormat(d3.format(",.1f")) // this is a way of modifying how many decimals are displayed
 
+    // select chart, give it attributes (relating to margin)
+    // add a g object and orient it at the top-left corner
     var chart = d3.select(".chart")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
       .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
+    // add g object for x class, puts x-axis where it should be
     chart.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
 
+    // add g object for y class, puts y-axis where it should be
     chart.append("g")
         .attr("class", "y axis")
         .call(yAxis)
@@ -185,6 +197,8 @@
         .style("text-anchor", "end")
         .text("Count")
 
+    // creates actual bars from the data
+    // assigns appropriate (x, y) coordinates, weights, and heights
     chart.selectAll(".bar")
         .data(Object.keys(dictionary))
       .enter().append("rect")
@@ -197,65 +211,25 @@
 
 
 
-
-    /* this is a multi-line comment (!)
-
-    // example...
-
-    // defining data
-    var data = [4, 8, 15, 16, 23, 42]
-
-    // defining widths and bar heights
-    var width = 420, 
-        barHeight = 20
-
-    // defining x-scale
-    var x = d3.scale.linear()
-        .domain([0, d3.max(data)])
-        .range([0, 420])
-
-    // some chart things
-    var chart = d3.select(".chart")
-        .attr("width", width)
-        .attr("height", barHeight * data.length)
-
-    // actually creating the chart
-    var bar = chart.selectAll("g")
-        .data(data)
-          .enter().append("g")
-        .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; })
-
-    // some things to the bars
-    bar.append("rect")
-        .attr("x", 0)
-        .attr("width", x)
-        .attr("height", barHeight - 1)
-
-    // some more things to the bars
-    bar.append("text")
-        .attr("x", function(d) { return x(d) - 3; })
-        .attr("y", barHeight / 2)
-        .attr("dy", ".35em")
-        .text(function(d) { return d; })
-    
-    */
+    // for c-level functionality:
+    // note: have to change four things from at least two (2) of the following categories -
+    // 1. modify tick label formatting (e.g. change number of decimal points visible, size, spacing and/or frequency)
+    // 2. modify underlying grid and axis lines (e.g. adding/removing grid lines, changing color or line thickness of axis lines)
+    // 3. modify the bar colors (e.g. color vowels differently from consonants) (logic in bar values)
+    // 4. modify the sort order (e.g. sort alphabetically vs sort by value) (do this several ways)
 
 
+    // for b-level functionality:
+    // 1. show a grid line at the mouse y-position (behind the bars) when mouse is hovered over plot area, and show exact value for that line
+    // 2. add a button that allows you to change between sorting alphabetically and sorting by value (google button tutorial)
+    // 3. add a tooltip that shows the exact value of a bar when hovering over it 
+    // 4. figure out how to add a search box on the page, and show the word count for the text in that box instead of from the URL query string
 
 
-
-    /*
-
-    // compare to:
-    actually creating the chart
-    d3.select(".chart")
-        .selectAll("div")
-          .data(data)
-        .enter().append("div")
-          .style("width", function(d) { return x(d) + "px"; })
-          .text(function(d) { return d; });
-          
-    */
+    // for c-level functionality:
+    // 1. at the start of your visualization, show one bar at a time and smoothly grow each bar from the bottom up to its value (animated bar chart)
+    // 2. allow the user to continue adding new text via a search box and button combo, and use transitions to smoothly update the values
+    // 3. smoothly fade in the axis line, tick labels, and grid lines for the y-axis only when your plot area is hovered over by the mouse, and smoothly fade out that information when the plot area is no longer hovered over by the mouse
 
 
 

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+ 
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+ 
+    <title>D3 via Console</title>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+</head>
+ 
+<body align="center">
+<script>
+
+var colors = {
+    "grey":   "#bbbbbb",
+    "blue":   "#377eb8",
+    "purple": "#984ea3",
+    "green":  "#4daf4a",
+    "orange": "#ff7f00"
+};
+
+
+// what's happening here? defining initial things
+var radius = 10;
+// var margin = 0; // so can see dot off of screen
+var margin = 5;
+var width  = 300;
+var height = 300;
+
+
+// n is number of points have (will change to 30 eventually)
+// id starts off at 0
+var id = 0;
+var n  = 5;
+
+
+// casting duration time
+var duration = 1000;
+
+
+// this creates the actual SVG object (this ithe outer edge of things)
+var svg  = d3.select("body").append("svg");
+
+svg.attr("width", width);
+svg.attr("height", height);
+svg.style("border-color", colors.grey);
+svg.style("border-width", 1);
+svg.style("border-style", "solid");
+
+
+// this creates plot object (g object, actually)
+// plot area to translate margin by margin
+// might want to create circle on edge
+var plot = svg.append("g");
+plot.attr("transform", "translate(" + margin + "," + margin + ")");
+
+
+// create a bunch of random points (x,y)
+// update over time (every tick)
+// one of old random points will fall off at the end
+
+// note that we are assigning unique id to each of these random points
+// first point gets 0, next 1, next 2, next 3, ...
+// new points over time also old points falling off over time
+
+// so now add on mod (n+1) so that it will wrap around
+function random() {
+    // id = (id + 1) % (n + 1);
+    id = id + 1
+    return {"x": Math.random(), "y": Math.random(), "id": id};
+}
+
+
+// d3 does fancy selections based on data
+// update selections is stuff that's already there, already bound - only need to update things about them
+// exit selections are selections that want to remove
+// enter are new selections
+
+// so after everything is in (all new), then will have one in enter, one in exit, all others in update selection
+// note: also possible for point-values to change
+// note: e is an update point, just needs to update that
+// note: tell d3 when is it that we have an old point that we now have a new value
+// note: GIVE EVERY DATA POINT SOME KIND OF ID (in letters example, letter is the key)
+
+// ways of debugging:
+// console.log
+// console.warn
+
+var data = d3.range(n).map(random);
+console.log("Data:", data);
+
+
+// define x, maps thing
+var x = d3.scale.linear()
+    .domain([0,1])
+    .range([0, width-2*margin])
+
+// define y, maps thing
+var y = d3.scale.linear()
+    .domain([0,1])
+    .range([height-2*margin, 0])
+
+
+// every time call (click) on svg, call tick function (new point to data, old point shifted off)
+svg.on("click", tick);
+
+
+// this is a function to take in new point of data, and push off old point
+function tick() {
+    console.log("Tick:", data);
+
+    // completely empty to start with
+    var curPoints = plot.selectAll("circle")
+
+        // .data(data); // this will work, but how will d3 know what's new and what's old?
+
+        // what exactly does second argument do? tells d3 how to identify each data
+        // note: we use key function to do so (for us we will use ID)
+
+        // if seen ID=5, use update now
+        // if never seen ID=10, use enter (or even exit)
+
+        // for something in my array, what is the unique value?
+        // it is d.id!
+        // seems like a lot of things are happening under the hood here...
+        .data(data, function(d) {
+            return d.id
+        });
+
+    // what's happening here?
+    curPoints.transition()
+        .duration(duration)
+        .style("fill", colors.grey)
+
+    // these are points that we want to all enter at the same time
+    var newPoints = curPoints.enter();
+
+    var oldPoints = curPoints.exit();
+
+    console.log("cur", curPoints.size())
+    console.log("new", newPoints.size())
+    console.log("old", oldPoints.size())
+
+
+    newPoints.append("circle")
+        // check out what we're going (center of circle in x and y)
+        // using functions to translate from the [0,1] points to the actual locations in the SVG object
+        .attr("cx", function(d) {return x(d.x)})
+        .attr("cy", function(d) {return y(d.y)})
+        .attr("r", radius)
+        .style("fill-opacity", 0)
+        .style("fill", colors.orange)
+        .transition()
+            .duration(duration)
+            .delay(function(d, i) {
+                return i*100;
+            })
+            .style("fill-opacity", 0.8);
+
+        // what's broken here?
+        // d3 doesn't know what's old data point and what's new data point (!)
+        // have to set key function! (go back up a couple of lines)
+
+    oldPoints.transition()
+        .duration(duration)
+        .style("fill", colors.green)
+        // at end of each transition
+        .each("end", function() {
+            d3.select(this).transition()
+                .duration(duration)
+                .style("fill-opacity", 0)
+                .remove()
+        });
+
+    // update data
+    data.push(random()); // pushes off random element
+    data.shift(); // first element
+
+}
+
+
+
+
+
+</script>
+</body>
+</html>
