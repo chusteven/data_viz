@@ -9,11 +9,9 @@
 
 <title>MSAN 622 Information Visualization</title>
 
-<!-- what is a link class? -->
 <link href="css/bootstrap.min.css" rel="stylesheet">
 <link href="css/bootstrap-theme.min.css" rel="stylesheet">
 
-<!-- this is probably for the entire body thing? -->
 <style type="text/css">
     body {
         padding-top: 50px;
@@ -33,6 +31,7 @@
 <!-- this is defining the style for the objects we will have populating our page -->
 <style>
 
+/*not entirely sure what this is for*/
 svg {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   position: relative;
@@ -44,7 +43,7 @@ svg {
 }
 
 .axis {
-  font: 10px sans-serif;
+  font: 12px sans-serif;
 }
 
 .axis path,
@@ -59,12 +58,14 @@ svg {
   display: none;
 }
 
+/*this is for the sort button i think...*/
 label {
   position: absolute;
   top: 155px;
   right: 275px;
 }
 
+/*this is for the grid lines*/
 .grid .tick {
     stroke: lightgrey;
     opacity: 0.7;
@@ -73,6 +74,7 @@ label {
       stroke-width: 0;
 }
 
+/*this is for the tip object*/
 .d3-tip {
   line-height: 1;
   font-weight: bold;
@@ -82,7 +84,7 @@ label {
   border-radius: 2px;
 }
 
-/* Creates a small triangle extender for the tooltip */
+/* creates a small triangle extender for the tooltip */
 .d3-tip:after {
   box-sizing: border-box;
   display: inline;
@@ -95,7 +97,7 @@ label {
   text-align: center;
 }
 
-/* Style northward tooltips differently */
+/* style northward tooltips differently */
 .d3-tip.n:after {
   margin: -1px 0 0 0;
   top: 100%;
@@ -104,7 +106,7 @@ label {
 
 </style>
 
-<!-- Fixed Navbar -->
+<!-- fixed Navbar -->
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
@@ -117,7 +119,6 @@ label {
             <a class="navbar-brand" href="#">MSN 622</a>
         </div>
 
-        <!-- an li object is a list object thing -->
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <li><a href="#homework">Homework</a></li>
@@ -142,16 +143,18 @@ label {
 
     <svg class="chart"></svg>
 
+    <!-- this could probably go somewhere else more efficient? -->
     <label><input type="checkbox">sort values</label>
 
+    <!-- this is where my functionality explanation goes -->
     <div class="media-body">
-        <h1 class="page-header">About this assignment</h1>
+        <h1 class="page-header">Functionality implemented</h1>
         
         <p>For C-level functionality, I made the following changes:</p>
 
         <ul>
             <li>Changed the frequency of tick marks on the y axis (one per integer up to the max count value)</li>
-            <li>Changed the format of tick marks on y axis to display only round numbers</li>
+            <li>Changed the format of tick marks on y axis to display only integer values</li>
             <li>Made it so vowels are colored differently (orange) than consonants (blue)</li>
             <li>Added horizontal grid lines</li>
         </ul>
@@ -159,7 +162,7 @@ label {
         <p>For B-level functionality, I made the following changes:</p>
 
         <ul>
-            <li>Added a button so that my bar graph can alternate between being sorted by values and alphabetically</li>
+            <li>Added a button so that my bar graph can alternate between being sorted by values as well as alphabetically</li>
             <li>Added a tooltip option that displays the letter as well as its count when hovering over a bar</li>
         </ul>
 
@@ -169,25 +172,16 @@ label {
             <li>Made my bar graph grow one bar at a time, smoothly from the bottom to the top</li>
         </ul>
 
-        <!-- 
-
-            for b-level functionality:
-            1. show a grid line at the mouse y-position (behind the bars) when mouse is hovered over plot area, and show exact value for that line
-            2. add a button that allows you to change between sorting alphabetically and sorting by value (google button tutorial)
-            3. add a tooltip that shows the exact value of a bar when hovering over it 
-            4. figure out how to add a search box on the page, and show the word count for the text in that box instead of from the URL query string
-
-
-            for a-level functionality:
-            1. at the start of your visualization, show one bar at a time and smoothly grow each bar from the bottom up to its value (animated bar chart)
-            2. allow the user to continue adding new text via a search box and button combo, and use transitions to smoothly update the values
-            3. smoothly fade in the axis line, tick labels, and grid lines for the y-axis only when your plot area is hovered over by the mouse, and smoothly fade out that information when the plot area is no longer hovered over by the mouse
-
-        -->
-
+        <!-- this is where my discussion goes -->
         <h1 class="page-header">Discussion</h1>
 
-        <p>A big discussion here!!!</p>
+        <p>I added the aforementioned functionality to my visualization for three main reasons I will discuss below. They are aesthetics, readability, and interactivity</p>
+
+        <p>For aesthetic purposes, I changed the colors of the vowel bars to be orange as opposed to the blue color of the consonants so as to highlight those particular letters. The way I figure is that vowels are particularly special letters and I wanted to draw attention to them. Additionally, I kept the axes relatively thin so as to draw attention away from those particular elements of the chart and more towards the bars.</p>
+
+        <p>For readability, I added the horizontal grid lines. This way, when a user inputs a string with many letters, the user does not have to work so hard to determine the height of a particular letter. Additionally, the hover-over option makes it so that users can get the exact letter as well as count of occurances when they hover over that bar. This bit of interactivity will certainly be useful when values are not as round.</p>
+
+        <p>In addition to adding the hover-over option for the bars, I added the option for users to sort the bar chart either by values (from greatest to least) or alphabetically. This gives the user a bit of control over how they might be interested in visualizing the information available to them.</p>
 
     </div>
 
@@ -206,6 +200,8 @@ label {
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/d3.min.js"></script>
+
+<!-- this is for the tip object creation -->
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 
 <script>
@@ -217,12 +213,14 @@ label {
     // making all lower case, getting rid of special characters/punctuation, numbers, and spaces
     var newQuery = originalQuery
                         .toLowerCase()
-                        .replace(/[\d+\.\?,-\/#!$%\^&\*;:{}=\-_`'"~()]/g, "")
+                        .replace(/[\d+\.\?,-\/#!$%\^&\*;:{}=\-_`'"~\[\]\\<>|@()]/g, "")
+                        // .replace(/\\/g, "")
                         .replace(/\s/g, "")
     
 
     // creating dictionary type object
     var dictionary = {};
+
 
     // storing letters of the query in that object
     for (var i = 0; i < newQuery.length; i++) {
@@ -233,6 +231,7 @@ label {
             dictionary[newQuery[i]] = 1   
         }
     }
+
 
     // setting the data object
     data = d3.entries(dictionary)
@@ -252,6 +251,7 @@ label {
         // note: the latter two inputs are in proportions (0.0-1.0) of the step size
         .rangeRoundBands([0, width], .1, .45)
 
+
     // creating y domain and range for origins of bars
     var y = d3.scale.linear()
         // .domain([0, d3.max(d3.values(dictionary))])
@@ -264,6 +264,7 @@ label {
         .scale(x)
         .orient("bottom")
 
+
     // create axis, scale appropriately, put on left
     var yAxis = d3.svg.axis()
         .scale(y)
@@ -273,7 +274,7 @@ label {
         .tickSubdivide(0)
 
     
-    // making y axis grid lines
+    // this function is for making y axis grid lines
     function make_y_axis() {        
     return d3.svg.axis()
         .scale(y)
@@ -282,12 +283,11 @@ label {
     }
 
 
-    // make a tip object
+    // this is for creating the tip line
     var tip = d3.tip()
                 .attr("class", "d3-tip")
                 .offset([-10, 0])
                 .html(function(d) { 
-                    // return "<strong>Count:</strong> <span style='color:red'>" + d.value + "</span>";
                     return "Letter: " + d.key + ", " + "Count: " + d.value;
                 })
 
@@ -300,11 +300,13 @@ label {
       .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
+
     // add g object for x class, puts x-axis where it should be
     chart.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
+
 
     // adding grid lines!
     chart.append("g")
@@ -313,7 +315,9 @@ label {
             .tickSize(-width, 0, 0)
             .tickFormat(""))
 
+
     // add g object for y class, puts y-axis where it should be
+    // also adding text to the y-axis object...
     chart.append("g")
         .attr("class", "y axis")
         .call(yAxis)
@@ -344,15 +348,6 @@ label {
             .attr("height", function(d) { return height - y(d.value) }) // returns the height (complement of the whole graph) to draw rest of bar
 
 
-    chart.selectAll(".bar").data(data).call(tip)
-
-
-    // bar's variable has a .on
-    // need to create tip object - had method tip show and hide
-    chart.selectAll(".bar").on("mouseover", tip.show)
-        .on("mouseoff", tip.hide)
-
-
     // select these bars and fill them according to some logic
     chart.selectAll(".bar")
         .data(data)
@@ -361,19 +356,21 @@ label {
         })
 
 
+    // calling the tip object for all the bar objects
+    // giving it the mouseover/mouseout options to show/hide the tip
+    chart.selectAll(".bar")
+        .data(data)
+        .call(tip)
+        .on("mouseover", tip.show)
+        .on("mouseout", tip.hide)
+
+
     // make it so that on the input, my change function gets called
     d3.select("input").on("change", change);
 
 
-    // why don't i need these things?
-    // var sortTimeout = setTimeout(function() {
-    //   d3.select("input").property("checked", true).each(change);
-    // }, 2000);
-
-
+    // should probably revisit this function when have more time to understand how it works...
     function change() {
-    // why don't i need this?
-    // clearTimeout(sortTimeout);
 
     // copy-on-write since tweens are evaluated after a delay
     var x0 = x.domain((data).sort(this.checked
