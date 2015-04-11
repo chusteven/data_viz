@@ -33,8 +33,10 @@
 <!-- this is defining the style for the objects we will have populating our page -->
 <style>
 
-.bar {
-  fill: steelblue
+svg {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  position: relative;
+  width: 960px;
 }
 
 .bar:hover {
@@ -42,7 +44,7 @@
 }
 
 .axis {
-  font: 15px sans-serif;
+  font: 10px sans-serif;
 }
 
 .axis path,
@@ -57,8 +59,13 @@
   display: none;
 }
 
-</style>
+label {
+  position: absolute;
+  top: 160px;
+  right: 285px;
+}
 
+</style>
 
 <!-- Fixed Navbar -->
 <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -90,13 +97,85 @@
     </div>
 </nav>
 
-<div class="container">
+<div class="container" id="thing">
 
     <h1 class="page-header">
         Homework 1: Letter Count Bar Chart
     </h1>
 
     <svg class="chart"></svg>
+
+    <label><input type="checkbox">Sort values</label>
+
+    <div class="media-body">
+        <h1 class="page-header">
+            About this assignment
+        </h1>
+        
+        <p>For C-level functionality, I made the following changes:</p>
+
+        <ul>
+            <li>Changed the frequency of tick marks on the y axis (one per integer up to the max count value)</li>
+            <li>Changed the format of tick marks on y axis to display only round numbers</li>
+            <li>Made it so vowels are colored differently (orange) than consonants (blue)</li>
+        </ul>
+
+        <p>For B-level functionality, I made the following changes:</p>
+
+        <ul>
+            <li>Added a button so that my bar graph can alternate between being sorted by values and alphabetically</li>
+            <li>Added a tooltip option</li>
+        </ul>
+
+        <p>For A-level functionality, I made the following changes:</p>
+
+        <ul>
+            <li>Made my bar graph grow one bar at a time, smoothly from the bottom to the top</li>
+        </ul>
+
+    <!--     for c-level functionality:
+        note: have to change four things from at least two (2) of the following categories -
+        1. modify tick label formatting (e.g. change number of decimal points visible, size, spacing and/or frequency)
+        2. modify underlying grid and axis lines (e.g. adding/removing grid lines, changing color or line thickness of axis lines)
+        3. modify the bar colors (e.g. color vowels differently from consonants) (logic in bar values)
+        4. modify the sort order (e.g. sort alphabetically vs sort by value) (do this several ways)
+
+        what have i done?
+        sorted the bar chart alphabetically (built into xAxis object)
+        changed frequency of tick marks on y axis (one per integer up to max integer)
+        changed format of tick marks on y axis (only display integer)
+        made it so vowels are colored differently than consonants
+
+        add horizontal grid lines! (http://www.d3noob.org/2013/01/adding-grid-lines-to-d3js-graph.html)
+        can change color and thickness of axis lines no problem
+
+
+
+        for b-level functionality:
+        1. show a grid line at the mouse y-position (behind the bars) when mouse is hovered over plot area, and show exact value for that line
+        2. add a button that allows you to change between sorting alphabetically and sorting by value (google button tutorial)
+        3. add a tooltip that shows the exact value of a bar when hovering over it 
+        4. figure out how to add a search box on the page, and show the word count for the text in that box instead of from the URL query string
+
+        what have i done?
+        will: add button to sort things by value (http://bl.ocks.org/mbostock/3885705)
+        want: add tooltip (http://bl.ocks.org/Caged/6476579)
+        want: add search box
+        want: grid line hover at mouse y-position (behind bars) + show exact value for that line
+
+
+
+        for a-level functionality:
+        1. at the start of your visualization, show one bar at a time and smoothly grow each bar from the bottom up to its value (animated bar chart)
+        2. allow the user to continue adding new text via a search box and button combo, and use transitions to smoothly update the values
+        3. smoothly fade in the axis line, tick labels, and grid lines for the y-axis only when your plot area is hovered over by the mouse, and smoothly fade out that information when the plot area is no longer hovered over by the mouse
+
+        what have i done?
+        will: show one bar at a time, smoothly grow each bar from bottom up to value!
+        want: smoothly fade in axis line, tick labels, and grid lines when plot hovered over, smooth fade out
+        want: add new text via search box/button + transitions for values -->
+
+    </div>
 
 </div>
 
@@ -119,46 +198,51 @@
     // grabbing the actual query string
     var originalQuery = decodeURI(window.location.search)
 
-    // making all lower case, getting rid of special characters/punctuation, and spaces
+
+    // making all lower case, getting rid of special characters/punctuation, numbers, and spaces
     var newQuery = originalQuery
                         .toLowerCase()
-                        .replace(/[\.\?,-\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+                        .replace(/[\d+\.\?,-\/#!$%\^&\*;:{}=\-_`'"~()]/g, "")
                         .replace(/\s/g, "")
     
-    // creating dictionary type object
-    var dictionary = new Object()
 
+    // creating dictionary type object
+    var dictionary = {};
 
     // storing letters of the query in that object
-    for (var i in newQuery) {
-        
-        // if not seen this value before, give inital value of 1
-        if (dictionary[newQuery[i]] == null) {
-            dictionary[newQuery[i]] = 1
+    for (var i = 0; i < newQuery.length; i++) {
+        if (newQuery[i] in dictionary) {
+            dictionary[newQuery[i]] += 1
         }
-
-        // if seen this value, then add 1 to count
         else {
-            dictionary[newQuery[i]] += 1   
+            dictionary[newQuery[i]] = 1   
         }
     }
+
+    // setting the data object
+    data = d3.entries(dictionary)
+
 
     // setting margins
     var margin = {top: 20, right: 20, bottom: 30, left: 40},
         width = 960 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom
 
+
     // creating x domain and range for origins of bars
     var x = d3.scale.ordinal()
-        .domain(Object.keys(dictionary))
+        // .domain(Object.keys(dictionary).sort()) // sorting the letters alphabetically
+        .domain(data.map(function(d) { return d.key }))
         // note: here are three inputs: the domain, inner padding, outer padding
         // note: the latter two inputs are in proportions (0.0-1.0) of the step size
         .rangeRoundBands([0, width], .1)
 
     // creating y domain and range for origins of bars
     var y = d3.scale.linear()
-        .domain([0, d3.max(d3.values(dictionary))])
+        // .domain([0, d3.max(d3.values(dictionary))])
+        .domain([0, d3.max(data, function(d) {return d.value })])
         .range([height, 0])
+
 
     // create axis, scale appropriately, put on bottom
     var xAxis = d3.svg.axis()
@@ -169,8 +253,10 @@
     var yAxis = d3.svg.axis()
         .scale(y)
         .orient("left")
-        .ticks(10) // tels how many ticks will actually be on display
-        .tickFormat(d3.format(",.1f")) // this is a way of modifying how many decimals are displayed
+        .ticks(d3.max(data, function(d) {return d.value })) // programatically making the number of ticks possible
+        .tickFormat(d3.format("d")) // ",.1f" makes is so that one decimal point is displayed for floating point number; "d" does integers
+        .tickSubdivide(0)
+
 
     // select chart, give it attributes (relating to margin)
     // add a g object and orient it at the top-left corner
@@ -197,51 +283,68 @@
         .style("text-anchor", "end")
         .text("Count")
 
+
     // creates actual bars from the data
     // assigns appropriate (x, y) coordinates, weights, and heights
     chart.selectAll(".bar")
-        .data(Object.keys(dictionary))
+        .data(data)
       .enter().append("rect")
-        .attr("class", "bar")
-        .attr("x", function(d) { return x(d) })
-        .attr("width", x.rangeBand())
-        .attr("y", function(d) { return y(dictionary[d]) })
-        .attr("height", function(d) { return height - y(dictionary[d]) })
+        .attr("class", "bar") // giving it the attributes necessary
+        .attr("x", function(d) { return x(d.key) }) // returns the actual letter
+        .attr("width", x.rangeBand()) // defining the width band
+        .attr("y", height) // this is where i start my bars (bottom)
+        .attr("height", 0) // this is how tall my heights start out being (0)
+        .transition() // defining a transition period
+            .duration(300) // defining the duration of the, per bar, growth period
+            .delay(function(d, i) { return i*200 }) // making so these things have a delay between data points
+            .attr("y", function(d) { return y(d.value) }) // returns the y position the letter needs to start at
+            .attr("height", function(d) { return height - y(d.value) }) // returns the height (complement of the whole graph) to draw rest of bar
 
 
+    // select these bars and fill them according to some logic
+    chart.selectAll(".bar")
+        .data(data)
+        .attr("fill", function(d) { 
+            return (/^[aeiou]$/i).test(d.key) ? "#ff7f00" : "#377eb8";
+        })
 
 
-    // for c-level functionality:
-    // note: have to change four things from at least two (2) of the following categories -
-    // 1. modify tick label formatting (e.g. change number of decimal points visible, size, spacing and/or frequency)
-    // 2. modify underlying grid and axis lines (e.g. adding/removing grid lines, changing color or line thickness of axis lines)
-    // 3. modify the bar colors (e.g. color vowels differently from consonants) (logic in bar values)
-    // 4. modify the sort order (e.g. sort alphabetically vs sort by value) (do this several ways)
+    // make it so that on the input, my change function gets called
+    d3.select("input").on("change", change);
 
+    // why don't i need these things?
+    // var sortTimeout = setTimeout(function() {
+    //   d3.select("input").property("checked", true).each(change);
+    // }, 2000);
 
-    // for b-level functionality:
-    // 1. show a grid line at the mouse y-position (behind the bars) when mouse is hovered over plot area, and show exact value for that line
-    // 2. add a button that allows you to change between sorting alphabetically and sorting by value (google button tutorial)
-    // 3. add a tooltip that shows the exact value of a bar when hovering over it 
-    // 4. figure out how to add a search box on the page, and show the word count for the text in that box instead of from the URL query string
+    function change() {
+    // why don't i need this?
+    // clearTimeout(sortTimeout);
 
+    // copy-on-write since tweens are evaluated after a delay
+    var x0 = x.domain((data).sort(this.checked
+        ? function(a, b) { return b.value - a.value; }
+        : function(a, b) { return d3.ascending(a.key, b.key); })
+        .map(function(d) { return d.key; }))
+        .copy();
 
-    // for c-level functionality:
-    // 1. at the start of your visualization, show one bar at a time and smoothly grow each bar from the bottom up to its value (animated bar chart)
-    // 2. allow the user to continue adding new text via a search box and button combo, and use transitions to smoothly update the values
-    // 3. smoothly fade in the axis line, tick labels, and grid lines for the y-axis only when your plot area is hovered over by the mouse, and smoothly fade out that information when the plot area is no longer hovered over by the mouse
+    chart.selectAll(".bar")
+        .sort(function(a, b) { return x0(a.key) - x0(b.key); });
 
+    var transition = chart.transition().duration(750),
+        delay = function(d, i) { return i * 50; };
+
+    transition.selectAll(".bar")
+        .delay(delay)
+        .attr("x", function(d) { return x0(d.key); });
+
+    transition.select(".x.axis")
+        .call(xAxis)
+      .selectAll("g")
+        .delay(delay);
+    }
 
 
 </script>
-
-<!-- STUDENTS: Remove this after verifying D3 is working. //-->
-
-<!-- 
-<script src="js/testD3.js"></script>
-<script>testD3("demo");</script>
-</body>
-</html>
--->
 
 
