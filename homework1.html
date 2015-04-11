@@ -61,8 +61,45 @@ svg {
 
 label {
   position: absolute;
-  top: 160px;
-  right: 285px;
+  top: 155px;
+  right: 275px;
+}
+
+.grid .tick {
+    stroke: lightgrey;
+    opacity: 0.7;
+}
+.grid path {
+      stroke-width: 0;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
 }
 
 </style>
@@ -105,12 +142,10 @@ label {
 
     <svg class="chart"></svg>
 
-    <label><input type="checkbox">Sort values</label>
+    <label><input type="checkbox">sort values</label>
 
     <div class="media-body">
-        <h1 class="page-header">
-            About this assignment
-        </h1>
+        <h1 class="page-header">About this assignment</h1>
         
         <p>For C-level functionality, I made the following changes:</p>
 
@@ -118,62 +153,41 @@ label {
             <li>Changed the frequency of tick marks on the y axis (one per integer up to the max count value)</li>
             <li>Changed the format of tick marks on y axis to display only round numbers</li>
             <li>Made it so vowels are colored differently (orange) than consonants (blue)</li>
+            <li>Added horizontal grid lines</li>
         </ul>
 
         <p>For B-level functionality, I made the following changes:</p>
 
         <ul>
             <li>Added a button so that my bar graph can alternate between being sorted by values and alphabetically</li>
-            <li>Added a tooltip option</li>
+            <li>Added a tooltip option that displays the letter as well as its count when hovering over a bar</li>
         </ul>
 
-        <p>For A-level functionality, I made the following changes:</p>
+        <p>For A-level functionality, I made the following change:</p>
 
         <ul>
             <li>Made my bar graph grow one bar at a time, smoothly from the bottom to the top</li>
         </ul>
 
-    <!--     for c-level functionality:
-        note: have to change four things from at least two (2) of the following categories -
-        1. modify tick label formatting (e.g. change number of decimal points visible, size, spacing and/or frequency)
-        2. modify underlying grid and axis lines (e.g. adding/removing grid lines, changing color or line thickness of axis lines)
-        3. modify the bar colors (e.g. color vowels differently from consonants) (logic in bar values)
-        4. modify the sort order (e.g. sort alphabetically vs sort by value) (do this several ways)
+        <!-- 
 
-        what have i done?
-        sorted the bar chart alphabetically (built into xAxis object)
-        changed frequency of tick marks on y axis (one per integer up to max integer)
-        changed format of tick marks on y axis (only display integer)
-        made it so vowels are colored differently than consonants
-
-        add horizontal grid lines! (http://www.d3noob.org/2013/01/adding-grid-lines-to-d3js-graph.html)
-        can change color and thickness of axis lines no problem
+            for b-level functionality:
+            1. show a grid line at the mouse y-position (behind the bars) when mouse is hovered over plot area, and show exact value for that line
+            2. add a button that allows you to change between sorting alphabetically and sorting by value (google button tutorial)
+            3. add a tooltip that shows the exact value of a bar when hovering over it 
+            4. figure out how to add a search box on the page, and show the word count for the text in that box instead of from the URL query string
 
 
+            for a-level functionality:
+            1. at the start of your visualization, show one bar at a time and smoothly grow each bar from the bottom up to its value (animated bar chart)
+            2. allow the user to continue adding new text via a search box and button combo, and use transitions to smoothly update the values
+            3. smoothly fade in the axis line, tick labels, and grid lines for the y-axis only when your plot area is hovered over by the mouse, and smoothly fade out that information when the plot area is no longer hovered over by the mouse
 
-        for b-level functionality:
-        1. show a grid line at the mouse y-position (behind the bars) when mouse is hovered over plot area, and show exact value for that line
-        2. add a button that allows you to change between sorting alphabetically and sorting by value (google button tutorial)
-        3. add a tooltip that shows the exact value of a bar when hovering over it 
-        4. figure out how to add a search box on the page, and show the word count for the text in that box instead of from the URL query string
+        -->
 
-        what have i done?
-        will: add button to sort things by value (http://bl.ocks.org/mbostock/3885705)
-        want: add tooltip (http://bl.ocks.org/Caged/6476579)
-        want: add search box
-        want: grid line hover at mouse y-position (behind bars) + show exact value for that line
+        <h1 class="page-header">Discussion</h1>
 
-
-
-        for a-level functionality:
-        1. at the start of your visualization, show one bar at a time and smoothly grow each bar from the bottom up to its value (animated bar chart)
-        2. allow the user to continue adding new text via a search box and button combo, and use transitions to smoothly update the values
-        3. smoothly fade in the axis line, tick labels, and grid lines for the y-axis only when your plot area is hovered over by the mouse, and smoothly fade out that information when the plot area is no longer hovered over by the mouse
-
-        what have i done?
-        will: show one bar at a time, smoothly grow each bar from bottom up to value!
-        want: smoothly fade in axis line, tick labels, and grid lines when plot hovered over, smooth fade out
-        want: add new text via search box/button + transitions for values -->
+        <p>A big discussion here!!!</p>
 
     </div>
 
@@ -192,6 +206,7 @@ label {
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/d3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 
 <script>
     
@@ -235,7 +250,7 @@ label {
         .domain(data.map(function(d) { return d.key }))
         // note: here are three inputs: the domain, inner padding, outer padding
         // note: the latter two inputs are in proportions (0.0-1.0) of the step size
-        .rangeRoundBands([0, width], .1)
+        .rangeRoundBands([0, width], .1, .45)
 
     // creating y domain and range for origins of bars
     var y = d3.scale.linear()
@@ -253,9 +268,28 @@ label {
     var yAxis = d3.svg.axis()
         .scale(y)
         .orient("left")
-        .ticks(d3.max(data, function(d) {return d.value })) // programatically making the number of ticks possible
+        .ticks(d3.max(data, function(d) { return d.value })) // programatically making the number of ticks possible
         .tickFormat(d3.format("d")) // ",.1f" makes is so that one decimal point is displayed for floating point number; "d" does integers
         .tickSubdivide(0)
+
+    
+    // making y axis grid lines
+    function make_y_axis() {        
+    return d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .ticks(d3.max(data, function(d) {return d.value }))
+    }
+
+
+    // make a tip object
+    var tip = d3.tip()
+                .attr("class", "d3-tip")
+                .offset([-10, 0])
+                .html(function(d) { 
+                    // return "<strong>Count:</strong> <span style='color:red'>" + d.value + "</span>";
+                    return "Letter: " + d.key + ", " + "Count: " + d.value;
+                })
 
 
     // select chart, give it attributes (relating to margin)
@@ -272,15 +306,24 @@ label {
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
 
+    // adding grid lines!
+    chart.append("g")
+        .attr("class", "grid")
+        .call(make_y_axis()
+            .tickSize(-width, 0, 0)
+            .tickFormat(""))
+
     // add g object for y class, puts y-axis where it should be
     chart.append("g")
         .attr("class", "y axis")
         .call(yAxis)
       .append("text")
         .attr("transform", "rotate(-90)")
-        .attr("y", 6)
+        .attr("x", -3)
+        .attr("y", 5)
         .attr("dy", ".71em")
         .style("text-anchor", "end")
+        .style("opacity", 1.0)
         .text("Count")
 
 
@@ -301,6 +344,15 @@ label {
             .attr("height", function(d) { return height - y(d.value) }) // returns the height (complement of the whole graph) to draw rest of bar
 
 
+    chart.selectAll(".bar").data(data).call(tip)
+
+
+    // bar's variable has a .on
+    // need to create tip object - had method tip show and hide
+    chart.selectAll(".bar").on("mouseover", tip.show)
+        .on("mouseoff", tip.hide)
+
+
     // select these bars and fill them according to some logic
     chart.selectAll(".bar")
         .data(data)
@@ -312,10 +364,12 @@ label {
     // make it so that on the input, my change function gets called
     d3.select("input").on("change", change);
 
+
     // why don't i need these things?
     // var sortTimeout = setTimeout(function() {
     //   d3.select("input").property("checked", true).each(change);
     // }, 2000);
+
 
     function change() {
     // why don't i need this?
