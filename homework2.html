@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- figure out what's up with this head class thing -->
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -19,19 +18,98 @@
     }
 </style>
 
-<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-<!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+
 </head>
 
 <body>
 
 <!-- this is defining the style for the objects we will have populating our page -->
-<style></style>
+<style>
 
-<!-- fixed Navbar -->
+/* for bubble plots */
+svg#bp .text{
+    font: 10px sans-serif;
+}
+
+svg#bp .dot {
+  stroke: #000;
+  opacity: 0.8;
+}
+
+svg#bp .axis {
+  font: 12px sans-serif;
+}
+
+svg#bp .axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+svg#bp .label {
+  fill: #777;
+}
+
+
+/* for scatter plots */
+
+
+
+/* for parallel plots */
+svg#pp {
+  font: 12px sans-serif;
+}
+
+svg#pp .background path {
+  fill: none;
+  stroke: none;
+  stroke-width: 20px;
+  pointer-events: stroke;
+}
+
+svg#pp .foreground path {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+svg#pp .axis .title {
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+svg#pp .axis line, .axis path {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+svg#pp .axis.string {
+  font-size: 6px;
+}
+
+svg#pp .label {
+  -webkit-transition: fill 125ms linear;
+}
+
+svg#pp .active .label:not(.inactive) {
+  font-weight: bold;
+  font-size: 11px;
+}
+
+svg#pp .label.inactive {
+  fill: #ccc;
+}
+
+svg#pp .foreground path.inactive {
+  stroke: #ccc;
+  stroke-opacity: .5;
+  stroke-width: 1px;
+}
+
+</style>
+
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
@@ -51,25 +129,43 @@
                 <li><a href="#participation">Participation</a></li>
             </ul>
 
-            <!-- notice that this pushes these buttons to the right of the screen -->
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="#about">About</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
-        </div><!--/.nav-collapse -->
+        </div>
     </div>
 </nav>
 
-<div class="container" id="thing">
+<div class="container">
 
-    <h1 class="page-header">
-        Homework 2: A Bunch of Other Charts
-    </h1>
+    <!-- title for homework -->
+    <!-- <div class="row" style="text-align:center;"> -->
+    <div class="row">
+        <h1>Homework 2: A Few Other Charts</h1>
+        <p>This is the page for Steven Chu's second homework assignment for MSAN 622. My source code can be found at my <a href="https://github.com/chusteven/spring-2015-msan622">github respository</a>.</p>
+    </div>
 
-    <svg class="chart"></svg>
+    <!-- bubble plot chart -->
+    <div class="row">
+        <div class="media-body" id="bubblePlot"></div>
+    </div>
 
+    <!-- scatter plot chart -->
+    <div class="row">
+        <div class="media-body" id="scatterPlot"></div>
+    </div>
+
+    <!-- parallel coordinates plot -->
+    <div class="row">
+        <div class="media-body" id="parallelPlot"></div>
+    </div>    
+
+</div>
+
+<div class="container">
     <!-- this is where my functionality explanation goes -->
-    <div class="media-body">
+    <div class="media-body" id="explanation">
         <h1 class="page-header">Functionality implemented</h1>
         
         <p>For C-level functionality, I made the following changes:</p>
@@ -110,31 +206,320 @@
     <p style="text-align: center;">Steven Chu &bullet; MSAN 622 Information Visualization &bullet; Spring 2015</p>
 </footer>
 
-</div><!--/.container -->
-
-<!-- this calls on the JavaScript things necessary to run the whole damn thing! -->
-<!-- interesting that it's positioned at the bottom rather than at the top like an import statement... -->
+</div>
 
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/d3.min.js"></script>
 
-<!-- this is for the tip object creation -->
-<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
-
 <!-- here is where all my Javascript goes -->
 <script>
     
-    // first thing to do is figure out how i'll read in the data
-    
+    // various accessors that specify the four dimensions of data to visualize.
+    function cx(d) { return d["Income"]; } // for specifying x-center of the bubble
+    function cy(d) { return d["Life.Exp"]; } // for specifying y-center of the bubble
+    function radius(d) { return d["Population"]; } // for specifying radius of the bubble
+    function color(d) { return d["state.region"]; } // for specifying color the buble
+    function key(d) { return d["state.name"]; } // for grabbing the name of the state
+    function order(a, b) { return radius(b) - radius(a); } // for sorting the bubbles by size
+
+
+    // chart dimensions (try changing these)
+    var margin = {top: 20, right: 20, bottom: 30, left: 40},
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+
+
+    // creating x, y, radius, color scaling functions
+    // question: is there a lie factor happening right here?
+    // note: the population is the input x, ideally would be reflected in something like a straight line
+    // note: but it is getting transformed to an area ... so lie factor is by squared times pi factor, i think (?)
+    var xScale = d3.scale.linear().range([0, width]),
+        yScale = d3.scale.linear().range([height, 0]),
+        radiusScale = d3.scale.sqrt().range([0, 10]), // ask myself why 10? is there a programmatic way to do this?
+        colorScale = d3.scale.category10();
+
+
+    // creating x and y axes (need to modify tick frequency as well as format)
+    var xAxis = d3.svg.axis()
+            .scale(xScale)
+            .orient("bottom"), 
+        yAxis = d3.svg.axis()
+            .scale(yScale)
+            .orient("left")
+            .tickFormat(d3.format(",.1f"))
+
+
+
     // need to make a bubble plot!
-    // tutorials on this
+    // http://chimera.labs.oreilly.com/books/1230000000345/ch06.html#_the_scatterplot (decent)
+    // http://bost.ocks.org/mike/nations/ (better)
+    // http://bost.ocks.org/mike/bar/3/
+
+    // thinking that i'll want a bubble per state
+    // what will their colors be? (maybe something like state.division or maybe state.region)
+    // what will be on x-axis and what will be on y-axis?
+    // have choices of: population, income, illiteracy, life expectancy, murder, hs graduation, frost, area
 
 
-    // another plot
+    var bubbleChart = d3.select("#bubblePlot").append("svg")
+        .attr("id", "bp")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-    // and one more for A-level functionality
+    // reading in the data and appending the chart and then creating the actual bubbles
+    d3.csv("states.csv", function(error, data) {
+
+        // adds domain to x, y, and radius scaling functions
+        xScale.domain([d3.min(data, function(d) { return cx(d)}), d3.max(data, function(d) { return cx(d)})]).nice();        
+        yScale.domain([d3.min(data, function(d) { return cy(d)}), d3.max(data, function(d) { return cy(d)})]).nice();
+        radiusScale.domain([0, d3.max(data, function(d) { return radius(d)})]).nice();
+
+        // add x axis (needs label)    
+        bubbleChart.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + height + ")")
+          .call(xAxis);
+
+        // add y axis (needs label)
+        bubbleChart.append("g")
+          .attr("class", "y axis")
+          .call(yAxis);
+
+        // Add an x-axis label.
+        bubbleChart.append("text")
+            .attr("class", "x label")
+            .attr("text-anchor", "end")
+            .attr("x", width)
+            .attr("y", height - 6)
+            .text("income per capita (dollars)");
+
+        // Add a y-axis label.
+        bubbleChart.append("text")
+            .attr("class", "y label")
+            .attr("text-anchor", "end")
+            .attr("y", 6)
+            .attr("dy", ".75em")
+            .attr("transform", "rotate(-90)")
+            .text("life expectancy (years)");
+
+
+        // creates bubbles for each state
+        bubbleChart.selectAll(".dot")
+          .data(data)
+        .enter().append("circle")
+          .attr("class", "dot")
+          .attr("cx", function(d) { return xScale(cx(d)); })
+          .attr("cy", function(d) { return yScale(cy(d)); })
+          .attr("r", function(d) { return radiusScale(radius(d))}) 
+          .style("fill", function(d) { return colorScale(color(d))})
+          .sort(order);
+
+        // create a legend for both colors (regions) as well as areas (population sizes)
+        // should i modify tick frequencies or counts? (think they're probably okay)
+
+    })
+    
+
+
+    // do i need to do things where can hover over each bubble? (that'd be cool, as well as displaying each state's numbers)
+    // need a key with a region mapper
+
+    // data-ink ratio - grid lines
+    // data-density - could add time animation too if had years (that'd be so cool! on some kind of brush over!)
+    // lie factor - always going to be some in bubble charts
+
+
+
+
+
+
+    // for B
+    // choice between scatterplot matrix or small multiples
+
+    // scatterplot would be picking four variables and doing basically a correlation plot for each pair
+    // would also showcase each state's distribution along the diagonal
+    // four different xAxis and four different yAxies frequency and tick marks
+
+    // small multiples could look at histograms
+    // pick a rectangular number of features and chart them
+
+
+
+
+
+
+    // for A, plot parallel coordinates
+    // http://bl.ocks.org/syntagmatic/4020926
+    // var parallelChart = d3.select("#parallelPlot").append("svg")
+    //     .attr("id", "pp")
+    //     .attr("width", width + margin.left + margin.right)
+    //     .attr("height", height + margin.top + margin.bottom)
+    //   .append("g")
+    //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+    // d3.csv("states.csv", function(error, data) {
+
+    // }
+
+
+
+
+
+
+    // code from http://bl.ocks.org/syntagmatic/4020926
+    // var dimensions = [
+    //   {
+    //     name: "state",
+    //     scale: d3.scale.ordinal().rangePoints([0, height]),
+    //     type: "string"
+    //   },
+    //   {
+    //     name: "division",
+    //     scale: d3.scale.linear().range([height, 0]),
+    //     type: "string"
+    //   },
+    //   {
+    //     name: "population",
+    //     scale: d3.scale.linear().range([0, height]),
+    //     type: "number"
+    //   },
+    //   {
+    //     name: "area (square miles)",
+    //     scale: d3.scale.linear().range([height, 0]),
+    //     type: "number"
+    //   },
+    //   {
+    //     name: "income (per capita)",
+    //     scale: d3.scale.linear().range([height, 0]),
+    //     type: "number"
+    //   },
+    //   {
+    //     name: "illiteracy",
+    //     scale: d3.scale.linear().range([height, 0]),
+    //     type: "number"
+    //   },
+    //   {
+    //     name: "life expectancy",
+    //     scale: d3.scale.linear().range([height, 0]),
+    //     type: "number"
+    //   },
+    //   {
+    //     name: "murder (per 100,000)",
+    //     scale: d3.scale.linear().range([height, 0]),
+    //     type: "number"
+    //   },
+    //   {
+    //     name: "percent high school graduates",
+    //     scale: d3.scale.linear().range([height, 0]),
+    //     type: "number"
+    //   },
+    //   {
+    //     name: "frost (number days)",
+    //     scale: d3.scale.linear().range([height, 0]),
+    //     type: "number"
+    //   }
+    // ];
+
+    // var x = d3.scale.ordinal()
+    //     .domain(dimensions.map(function(d) { return d.name; }))
+    //     .rangePoints([0, width]);
+
+    // var line = d3.svg.line()
+    //     .defined(function(d) { return !isNaN(d[1]); });
+
+    // var yAxis = d3.svg.axis()
+    //     .orient("left");
+
+    // var svg = d3.select("body").append("svg")
+    //     .attr("width", width + margin.left + margin.right)
+    //     .attr("height", height + margin.top + margin.bottom)
+    //   .append("g")
+    //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // var dimension = svg.selectAll(".dimension")
+    //     .data(dimensions)
+    //   .enter().append("g")
+    //     .attr("class", "dimension")
+    //     .attr("transform", function(d) { return "translate(" + x(d.name) + ")"; });
+
+    // d3.csv("cars.small.csv", function(data) {
+    //   dimensions.forEach(function(dimension) {
+    //     dimension.scale.domain(dimension.type === "number"
+    //         ? d3.extent(data, function(d) { return +d[dimension.name]; })
+    //         : data.map(function(d) { return d[dimension.name]; }).sort());
+    //   });
+
+    //   svg.append("g")
+    //       .attr("class", "background")
+    //     .selectAll("path")
+    //       .data(data)
+    //     .enter().append("path")
+    //       .attr("d", draw);
+
+    //   svg.append("g")
+    //       .attr("class", "foreground")
+    //     .selectAll("path")
+    //       .data(data)
+    //     .enter().append("path")
+    //       .attr("d", draw);
+
+    //   dimension.append("g")
+    //       .attr("class", "axis")
+    //       .each(function(d) { d3.select(this).call(yAxis.scale(d.scale)); })
+    //     .append("text")
+    //       .attr("class", "title")
+    //       .attr("text-anchor", "middle")
+    //       .attr("y", -9)
+    //       .text(function(d) { return d.name; });
+
+    //   var ordinal_labels = svg.selectAll(".axis text")
+    //       .on("mouseover", mouseover)
+    //       .on("mouseout", mouseout);
+
+    //   var projection = svg.selectAll(".background path,.foreground path")
+    //       .on("mouseover", mouseover)
+    //       .on("mouseout", mouseout);
+
+    //   function mouseover(d) {
+    //     svg.classed("active", true);
+
+    //     // this could be more elegant
+    //     if (typeof d === "string") {
+    //       projection.classed("inactive", function(p) { return p.name !== d; });
+    //       projection.filter(function(p) { return p.name === d; }).each(moveToFront);
+    //       ordinal_labels.classed("inactive", function(p) { return p !== d; });
+    //       ordinal_labels.filter(function(p) { return p === d; }).each(moveToFront);
+    //     } else {
+    //       projection.classed("inactive", function(p) { return p !== d; });
+    //       projection.filter(function(p) { return p === d; }).each(moveToFront);
+    //       ordinal_labels.classed("inactive", function(p) { return p !== d.name; });
+    //       ordinal_labels.filter(function(p) { return p === d.name; }).each(moveToFront);
+    //     }
+    //   }
+
+    //   function mouseout(d) {
+    //     svg.classed("active", false);
+    //     projection.classed("inactive", false);
+    //     ordinal_labels.classed("inactive", false);
+    //   }
+
+    //   function moveToFront() {
+    //     this.parentNode.appendChild(this);
+    //   }
+    // });
+
+    // function draw(d) {
+    //   return line(dimensions.map(function(dimension) {
+    //     return [x(dimension.name), dimension.scale(d[dimension.name])];
+    //   }));
+    // }
+
+
 
 </script>
 
