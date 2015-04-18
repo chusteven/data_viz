@@ -52,7 +52,32 @@ svg#bp .label {
 
 
 /* for scatter plots */
+svg#sp {
+  font: 10px sans-serif;
+  padding: 10px;
+}
 
+svg#sp .axis,
+.frame {
+  shape-rendering: crispEdges;
+}
+
+svg#sp .axis line {
+  stroke: #ddd;
+}
+
+svg#sp .axis path {
+  display: none;
+}
+
+svg#sp .frame {
+  fill: none;
+  stroke: #aaa;
+}
+
+svg#sp circle {
+  fill-opacity: .7;
+}
 
 
 /* for parallel plots */
@@ -140,24 +165,26 @@ svg#pp .foreground path.inactive {
 <div class="container">
 
     <!-- title for homework -->
-    <!-- <div class="row" style="text-align:center;"> -->
-    <div class="row">
+    <div class="row" style="text-align:center;">
         <h1>Homework 2: A Few Other Charts</h1>
         <p>This is the page for Steven Chu's second homework assignment for MSAN 622. My source code can be found at my <a href="https://github.com/chusteven/spring-2015-msan622">github respository</a>.</p>
     </div>
 
     <!-- bubble plot chart -->
     <div class="row">
+        <h2>A Bubble Plot</h2>
         <div class="media-body" id="bubblePlot"></div>
     </div>
 
     <!-- scatter plot chart -->
     <div class="row">
+        <h2>A Scatterplot</h2>
         <div class="media-body" id="scatterPlot"></div>
     </div>
 
     <!-- parallel coordinates plot -->
     <div class="row">
+        <h2>A Parallel Coordinates Plot</h2>
         <div class="media-body" id="parallelPlot"></div>
     </div>    
 
@@ -168,7 +195,7 @@ svg#pp .foreground path.inactive {
     <div class="media-body" id="explanation">
         <h1 class="page-header">Functionality implemented</h1>
         
-        <p>For C-level functionality, I made the following changes:</p>
+        <p>For C-level functionality:</p>
 
         <ul>
             <li>Thing 1</li>
@@ -176,7 +203,7 @@ svg#pp .foreground path.inactive {
             <li>Thing 3</li>
         </ul>
 
-        <p>For B-level functionality, I made the following changes:</p>
+        <p>For B-level functionality:</p>
 
         <ul>
             <li>Thing 1</li>
@@ -184,7 +211,7 @@ svg#pp .foreground path.inactive {
             <li>Thing 3</li>
         </ul>
 
-        <p>For A-level functionality, I made the following changes:</p>
+        <p>For A-level functionality:</p>
 
         <ul>
             <li>Thing 1</li>
@@ -214,6 +241,12 @@ svg#pp .foreground path.inactive {
 
 <!-- here is where all my Javascript goes -->
 <script>
+
+    // need to make a bubble plot!
+    // http://chimera.labs.oreilly.com/books/1230000000345/ch06.html#_the_scatterplot (decent)
+    // http://bost.ocks.org/mike/nations/ (better)
+    // http://bost.ocks.org/mike/bar/3/
+
     
     // various accessors that specify the four dimensions of data to visualize.
     function cx(d) { return d["Income"]; } // for specifying x-center of the bubble
@@ -223,22 +256,19 @@ svg#pp .foreground path.inactive {
     function key(d) { return d["state.name"]; } // for grabbing the name of the state
     function order(a, b) { return radius(b) - radius(a); } // for sorting the bubbles by size
 
-
     // chart dimensions (try changing these)
-    var margin = {top: 20, right: 20, bottom: 30, left: 40},
-        width = 960 - margin.left - margin.right,
-        height = 500 - margin.top - margin.bottom;
-
+    var bubbleMargin = {top: 20, right: 20, bottom: 30, left: 40},
+        bubbleWidth = 1000 - bubbleMargin.left - bubbleMargin.right,
+        bubbleHeight = 600 - bubbleMargin.top - bubbleMargin.bottom;
 
     // creating x, y, radius, color scaling functions
     // question: is there a lie factor happening right here?
     // note: the population is the input x, ideally would be reflected in something like a straight line
     // note: but it is getting transformed to an area ... so lie factor is by squared times pi factor, i think (?)
-    var xScale = d3.scale.linear().range([0, width]),
-        yScale = d3.scale.linear().range([height, 0]),
+    var xScale = d3.scale.linear().range([0, bubbleWidth]),
+        yScale = d3.scale.linear().range([bubbleHeight, 0]),
         radiusScale = d3.scale.sqrt().range([0, 10]), // ask myself why 10? is there a programmatic way to do this?
         colorScale = d3.scale.category10();
-
 
     // creating x and y axes (need to modify tick frequency as well as format)
     var xAxis = d3.svg.axis()
@@ -249,26 +279,13 @@ svg#pp .foreground path.inactive {
             .orient("left")
             .tickFormat(d3.format(",.1f"))
 
-
-
-    // need to make a bubble plot!
-    // http://chimera.labs.oreilly.com/books/1230000000345/ch06.html#_the_scatterplot (decent)
-    // http://bost.ocks.org/mike/nations/ (better)
-    // http://bost.ocks.org/mike/bar/3/
-
-    // thinking that i'll want a bubble per state
-    // what will their colors be? (maybe something like state.division or maybe state.region)
-    // what will be on x-axis and what will be on y-axis?
-    // have choices of: population, income, illiteracy, life expectancy, murder, hs graduation, frost, area
-
-
+    // creating the bubble chart objects
     var bubbleChart = d3.select("#bubblePlot").append("svg")
         .attr("id", "bp")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
+        .attr("width", bubbleWidth + bubbleMargin.left + bubbleMargin.right)
+        .attr("height", bubbleHeight + bubbleMargin.top + bubbleMargin.bottom)
       .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
+        .attr("transform", "translate(" + bubbleMargin.left + "," + bubbleMargin.top + ")");
 
     // reading in the data and appending the chart and then creating the actual bubbles
     d3.csv("states.csv", function(error, data) {
@@ -281,7 +298,7 @@ svg#pp .foreground path.inactive {
         // add x axis (needs label)    
         bubbleChart.append("g")
           .attr("class", "x axis")
-          .attr("transform", "translate(0," + height + ")")
+          .attr("transform", "translate(0," + bubbleHeight + ")")
           .call(xAxis);
 
         // add y axis (needs label)
@@ -293,8 +310,8 @@ svg#pp .foreground path.inactive {
         bubbleChart.append("text")
             .attr("class", "x label")
             .attr("text-anchor", "end")
-            .attr("x", width)
-            .attr("y", height - 6)
+            .attr("x", bubbleWidth)
+            .attr("y", bubbleHeight - 6)
             .text("income per capita (dollars)");
 
         // Add a y-axis label.
@@ -305,7 +322,6 @@ svg#pp .foreground path.inactive {
             .attr("dy", ".75em")
             .attr("transform", "rotate(-90)")
             .text("life expectancy (years)");
-
 
         // creates bubbles for each state
         bubbleChart.selectAll(".dot")
@@ -318,19 +334,7 @@ svg#pp .foreground path.inactive {
           .style("fill", function(d) { return colorScale(color(d))})
           .sort(order);
 
-        // create a legend for both colors (regions) as well as areas (population sizes)
-        // should i modify tick frequencies or counts? (think they're probably okay)
-
     })
-    
-
-
-    // do i need to do things where can hover over each bubble? (that'd be cool, as well as displaying each state's numbers)
-    // need a key with a region mapper
-
-    // data-ink ratio - grid lines
-    // data-density - could add time animation too if had years (that'd be so cool! on some kind of brush over!)
-    // lie factor - always going to be some in bubble charts
 
 
 
@@ -347,6 +351,125 @@ svg#pp .foreground path.inactive {
     // small multiples could look at histograms
     // pick a rectangular number of features and chart them
 
+    var scatterWidth = 960,
+        scatterSize = 150,
+        scatterPadding = 19.5;
+
+    var xScatter = d3.scale.linear()
+        .range([scatterPadding / 2, scatterSize - scatterPadding / 2]);
+
+    var yScatter = d3.scale.linear()
+        .range([scatterSize - scatterPadding / 2, scatterPadding / 2]);
+
+    var xAxisScatter = d3.svg.axis()
+        .scale(xScatter)
+        .orient("bottom")
+        .ticks(5);
+
+    var yAxisScatter = d3.svg.axis()
+        .scale(yScatter)
+        .orient("left")
+        .ticks(5);
+
+    var colorScatter = d3.scale.category10();
+
+    d3.csv("states.csv", function(error, data) {
+      var domainByTrait = {},
+      traits = d3.keys(data[0]).filter(function(d) { if (["region", "Frost", "Area", "state.region", 
+                                                        "state.division", "state.name", "state.abb"].indexOf(d) == -1) { return d }; }),
+      n = traits.length;
+
+      traits.forEach(function(trait) {
+        domainByTrait[trait] = d3.extent(data, function(d) { return d[trait]; });
+      });
+
+      console.log(domainByTrait)
+
+      xAxisScatter.tickSize(scatterSize * n);
+      yAxisScatter.tickSize(-scatterSize * n);
+
+      // var bubbleChart = d3.select("#bubblePlot").append("svg")
+      //   .attr("id", "bp")
+      //   .attr("width", bubbleWidth + bubbleMargin.left + bubbleMargin.right)
+      //   .attr("height", bubbleHeight + bubbleMargin.top + bubbleMargin.bottom)
+      // .append("g")
+      //   .attr("transform", "translate(" + bubbleMargin.left + "," + bubbleMargin.top + ")");
+
+      var scatterPlot = d3.select("#scatterPlot").append("svg")
+          .attr("id", "sp")
+          .attr("width", scatterSize * n + scatterPadding)
+          .attr("height", scatterSize * n + scatterPadding)
+        .append("g")
+          .attr("transform", "translate(" + scatterPadding + "," + scatterPadding / 2 + ")");
+
+      scatterPlot.selectAll(".x.axis")
+          .data(traits)
+        .enter().append("g")
+          .attr("class", "x axis")
+          .attr("transform", function(d, i) { return "translate(" + (n - i - 1) * scatterSize + ",0)"; })
+          .each(function(d) { 
+            // console.log("x domain:", domainByTrait[d]); // , "trait:", domainByTrait[i]); 
+            xScatter.domain(domainByTrait[d]); 
+            d3.select(this).call(xAxisScatter); 
+        });
+
+      scatterPlot.selectAll(".y.axis")
+          .data(traits)
+        .enter().append("g")
+          .attr("class", "y axis")
+          .attr("transform", function(d, i) { return "translate(0," + i * scatterSize + ")"; })
+          .each(function(d) {
+            yScatter.domain(domainByTrait[d]);
+            d3.select(this).call(yAxisScatter);
+        });
+
+      var cell = scatterPlot.selectAll(".cell")
+          .data(cross(traits, traits))
+        .enter().append("g")
+          .attr("class", "cell")
+          .attr("transform", function(d) { return "translate(" + (n - d.i - 1) * scatterSize + "," + d.j * scatterSize + ")"; })
+          .each(plot);
+
+      // console.log(cross(traits,traits))
+
+      // titles for the diagonal.
+      cell.filter(function(d) { return d.i === d.j; }).append("text")
+          .attr("x", scatterPadding)
+          .attr("y", scatterPadding)
+          .attr("dy", ".71em")
+          .text(function(d) { return d.x; });
+
+      function plot(p) {
+        var cell = d3.select(this);
+
+        xScatter.domain(domainByTrait[p.x]);
+        yScatter.domain(domainByTrait[p.y]);
+
+        cell.append("rect")
+            .attr("class", "frame")
+            .attr("x", scatterPadding / 2)
+            .attr("y", scatterPadding / 2)
+            .attr("width", scatterSize - scatterPadding)
+            .attr("height", scatterSize - scatterPadding);
+
+        cell.selectAll("circle")
+            .data(data)
+          .enter().append("circle")
+            .attr("cx", function(d) { return xScatter(d[p.x]); })
+            .attr("cy", function(d) { return yScatter(d[p.y]); })
+            .attr("r", 3)
+            .style("fill", function(d) { return colorScatter(d["state.region"]); });
+      }
+
+      function cross(a, b) {
+        var c = [], n = a.length, m = b.length, i, j;
+        for (i = -1; ++i < n;) for (j = -1; ++j < m;) c.push({x: a[i], i: i, y: b[j], j: j});
+        return c;
+      }
+
+      d3.select(self.frameElement).style("height", scatterSize * n + scatterPadding + 20 + "px");
+    });
+
 
 
 
@@ -354,172 +477,171 @@ svg#pp .foreground path.inactive {
 
     // for A, plot parallel coordinates
     // http://bl.ocks.org/syntagmatic/4020926
-    // var parallelChart = d3.select("#parallelPlot").append("svg")
-    //     .attr("id", "pp")
-    //     .attr("width", width + margin.left + margin.right)
-    //     .attr("height", height + margin.top + margin.bottom)
-    //   .append("g")
-    //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-
-    // d3.csv("states.csv", function(error, data) {
-
-    // }
-
-
-
-
-
-
     // code from http://bl.ocks.org/syntagmatic/4020926
-    // var dimensions = [
-    //   {
-    //     name: "state",
-    //     scale: d3.scale.ordinal().rangePoints([0, height]),
-    //     type: "string"
-    //   },
-    //   {
-    //     name: "division",
-    //     scale: d3.scale.linear().range([height, 0]),
-    //     type: "string"
-    //   },
-    //   {
-    //     name: "population",
-    //     scale: d3.scale.linear().range([0, height]),
-    //     type: "number"
-    //   },
-    //   {
-    //     name: "area (square miles)",
-    //     scale: d3.scale.linear().range([height, 0]),
-    //     type: "number"
-    //   },
-    //   {
-    //     name: "income (per capita)",
-    //     scale: d3.scale.linear().range([height, 0]),
-    //     type: "number"
-    //   },
-    //   {
-    //     name: "illiteracy",
-    //     scale: d3.scale.linear().range([height, 0]),
-    //     type: "number"
-    //   },
-    //   {
-    //     name: "life expectancy",
-    //     scale: d3.scale.linear().range([height, 0]),
-    //     type: "number"
-    //   },
-    //   {
-    //     name: "murder (per 100,000)",
-    //     scale: d3.scale.linear().range([height, 0]),
-    //     type: "number"
-    //   },
-    //   {
-    //     name: "percent high school graduates",
-    //     scale: d3.scale.linear().range([height, 0]),
-    //     type: "number"
-    //   },
-    //   {
-    //     name: "frost (number days)",
-    //     scale: d3.scale.linear().range([height, 0]),
-    //     type: "number"
-    //   }
-    // ];
 
-    // var x = d3.scale.ordinal()
-    //     .domain(dimensions.map(function(d) { return d.name; }))
-    //     .rangePoints([0, width]);
+    // defining margins for this particular graph
+    var parallelMargin = {top: 30, right: 40, bottom: 20, left: 100},
+        parallelWidth = 1000 - parallelMargin.left - parallelMargin.right,
+        parallelHeight = 600 - parallelMargin.top - parallelMargin.bottom;
 
-    // var line = d3.svg.line()
-    //     .defined(function(d) { return !isNaN(d[1]); });
+    // define dimensions that i want to plot
+    var dimensions = [
+      {
+        name: "state.name",
+        scale: d3.scale.ordinal().rangePoints([0, parallelHeight]),
+        type: "string"
+      },
+      {
+        name: "Population",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "Area",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "Income",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "Illiteracy",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "Life.Exp",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "Murder",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "HS.Grad",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "Frost",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      }
+    ];
 
-    // var yAxis = d3.svg.axis()
-    //     .orient("left");
+    // defining x axis object
+    var xScaleParallel = d3.scale.ordinal()
+        .domain(dimensions.map(function(d) { return d.name; }))
+        .rangePoints([0, parallelWidth]);
 
-    // var svg = d3.select("body").append("svg")
-    //     .attr("width", width + margin.left + margin.right)
-    //     .attr("height", height + margin.top + margin.bottom)
-    //   .append("g")
-    //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    // creating line function (?)
+    var line = d3.svg.line()
+        .defined(function(d) { return !isNaN(d[1]); });
 
-    // var dimension = svg.selectAll(".dimension")
-    //     .data(dimensions)
-    //   .enter().append("g")
-    //     .attr("class", "dimension")
-    //     .attr("transform", function(d) { return "translate(" + x(d.name) + ")"; });
+    // creating new y axis of sorts - want to know how exactly this interfaces with everything else
+    var yAxis2 = d3.svg.axis()
+        .orient("left");
 
-    // d3.csv("cars.small.csv", function(data) {
-    //   dimensions.forEach(function(dimension) {
-    //     dimension.scale.domain(dimension.type === "number"
-    //         ? d3.extent(data, function(d) { return +d[dimension.name]; })
-    //         : data.map(function(d) { return d[dimension.name]; }).sort());
-    //   });
+    // creating the parallel axes plot
+    var parallelChart = d3.select("#parallelPlot").append("svg")
+        .attr("id", "pp")
+        .attr("width", parallelWidth + parallelMargin.left + parallelMargin.right)
+        .attr("height", parallelHeight + parallelMargin.top + parallelMargin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + parallelMargin.left + "," + parallelMargin.top + ")");
 
-    //   svg.append("g")
-    //       .attr("class", "background")
-    //     .selectAll("path")
-    //       .data(data)
-    //     .enter().append("path")
-    //       .attr("d", draw);
+    // doing something about the dimensions
+    var dimension = parallelChart.selectAll(".dimension")
+        .data(dimensions)
+      .enter().append("g")
+        .attr("class", "dimension")
+        .attr("transform", function(d) { return "translate(" + xScaleParallel(d.name) + ")"; });
 
-    //   svg.append("g")
-    //       .attr("class", "foreground")
-    //     .selectAll("path")
-    //       .data(data)
-    //     .enter().append("path")
-    //       .attr("d", draw);
+    // actually reading in the data
+    d3.csv("states.csv", function(data) {
+      dimensions.forEach(function(dimension) {
+        dimension.scale.domain(dimension.type === "number"
+            ? d3.extent(data, function(d) { return +d[dimension.name]; })
+            : data.map(function(d) { return d[dimension.name]; }).sort());
+      });
 
-    //   dimension.append("g")
-    //       .attr("class", "axis")
-    //       .each(function(d) { d3.select(this).call(yAxis.scale(d.scale)); })
-    //     .append("text")
-    //       .attr("class", "title")
-    //       .attr("text-anchor", "middle")
-    //       .attr("y", -9)
-    //       .text(function(d) { return d.name; });
+      // what's going on here?
+      parallelChart.append("g")
+          .attr("class", "background")
+        .selectAll("path")
+          .data(data)
+        .enter().append("path")
+          .attr("d", draw);
 
-    //   var ordinal_labels = svg.selectAll(".axis text")
-    //       .on("mouseover", mouseover)
-    //       .on("mouseout", mouseout);
+      // and here?
+      parallelChart.append("g")
+          .attr("class", "foreground")
+        .selectAll("path")
+          .data(data)
+        .enter().append("path")
+          .attr("d", draw);
 
-    //   var projection = svg.selectAll(".background path,.foreground path")
-    //       .on("mouseover", mouseover)
-    //       .on("mouseout", mouseout);
+      // and here?
+      dimension.append("g")
+          .attr("class", "axis")
+          .each(function(d) { d3.select(this).call(yAxis2.scale(d.scale)); })
+        .append("text")
+          .attr("class", "title")
+          .attr("text-anchor", "middle")
+          .attr("y", -9)
+          .text(function(d) { return d.name; });
 
-    //   function mouseover(d) {
-    //     svg.classed("active", true);
+      // what is happening here? something about the ordinal labels?
+      var ordinal_labels = parallelChart.selectAll(".axis text")
+          .on("mouseover", mouseover)
+          .on("mouseout", mouseout);
 
-    //     // this could be more elegant
-    //     if (typeof d === "string") {
-    //       projection.classed("inactive", function(p) { return p.name !== d; });
-    //       projection.filter(function(p) { return p.name === d; }).each(moveToFront);
-    //       ordinal_labels.classed("inactive", function(p) { return p !== d; });
-    //       ordinal_labels.filter(function(p) { return p === d; }).each(moveToFront);
-    //     } else {
-    //       projection.classed("inactive", function(p) { return p !== d; });
-    //       projection.filter(function(p) { return p === d; }).each(moveToFront);
-    //       ordinal_labels.classed("inactive", function(p) { return p !== d.name; });
-    //       ordinal_labels.filter(function(p) { return p === d.name; }).each(moveToFront);
-    //     }
-    //   }
+      // some kind of projection thing going on now
+      var projection = parallelChart.selectAll(".background path,.foreground path")
+          .on("mouseover", mouseover)
+          .on("mouseout", mouseout);
 
-    //   function mouseout(d) {
-    //     svg.classed("active", false);
-    //     projection.classed("inactive", false);
-    //     ordinal_labels.classed("inactive", false);
-    //   }
+      // moseover function
+      function mouseover(d) {
+        parallelChart.classed("active", true);
 
-    //   function moveToFront() {
-    //     this.parentNode.appendChild(this);
-    //   }
-    // });
+        // this could be more elegant (?)
+        if (typeof d === "string") {
+          projection.classed("inactive", function(p) { return p.name !== d; });
+          projection.filter(function(p) { return p.name === d; }).each(moveToFront);
+          ordinal_labels.classed("inactive", function(p) { return p !== d; });
+          ordinal_labels.filter(function(p) { return p === d; }).each(moveToFront);
+        } else {
+          projection.classed("inactive", function(p) { return p !== d; });
+          projection.filter(function(p) { return p === d; }).each(moveToFront);
+          ordinal_labels.classed("inactive", function(p) { return p !== d.name; });
+          ordinal_labels.filter(function(p) { return p === d.name; }).each(moveToFront);
+        }
+      }
 
-    // function draw(d) {
-    //   return line(dimensions.map(function(dimension) {
-    //     return [x(dimension.name), dimension.scale(d[dimension.name])];
-    //   }));
-    // }
+      // mouseout function
+      function mouseout(d) {
+        parallelChart.classed("active", false);
+        projection.classed("inactive", false);
+        ordinal_labels.classed("inactive", false);
+      }
 
+      // what's going on here?
+      function moveToFront() {
+        this.parentNode.appendChild(this);
+      }
+    });
 
+    // and here?
+    function draw(d) {
+      return line(dimensions.map(function(dimension) {
+        return [xScaleParallel(dimension.name), dimension.scale(d[dimension.name])];
+      }));
+    }
 
 </script>
 
