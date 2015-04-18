@@ -167,7 +167,7 @@ svg#pp .foreground path.inactive {
     <!-- title for homework -->
     <div class="row" style="text-align:center;">
         <h1>Homework 2: A Few Other Charts</h1>
-        <p>This is the page for Steven Chu's second homework assignment for MSAN 622 (Spring 2015). My source code can be found in my <a href="https://github.com/chusteven/spring-2015-msan622">github respository</a>.</p>
+        <p>This page is for Steven Chu's second MSAN 622 homework assignment. Source code can be found in my <a href="https://github.com/chusteven/spring-2015-msan622">github respository</a>.</p>
     </div>
 
     <!-- bubble plot chart -->
@@ -180,8 +180,9 @@ svg#pp .foreground path.inactive {
             <li>Each bubble represents a state</li>
             <li>The size of the bubble represents that state's population size</li>
             <br>
-            <li>NB: would like to add tooltip to show exact values</li>
-            <li>NB: would like to create "hover over" option to highlight individual state</li>
+            <li>NB: would like to add a border around legend</li>
+            <li>NB: would like to add another legend so as to show population size comparisons</li>
+            <li>NB: would like to add tooltip to show exact values for each state on mouseover</li>
         </ul>
 
         <div class="media-body" id="bubblePlot"></div>
@@ -201,6 +202,7 @@ svg#pp .foreground path.inactive {
             <br>
             <li>NB: somehow x-axis values aren't showing up properly</li>
             <li>NB: graphic object is somehow messed up, making it so circles go off plottable area</li>
+            <li>NB: would like to more properly name features along each axis</li>
             <li>NB: would like to reintroduce brushing option</li>
         </ul>
 
@@ -219,6 +221,7 @@ svg#pp .foreground path.inactive {
             <li>Can highlight one state's values at a time</li>
             <br>
             <li>NB: somehow can't mouseover state names (like in tutorial)</li>
+            <li>NB: would like to more properly name features along each axis</li>
             <li>NB: would like to take a stab at the more advanced parallel plot</li>
         </ul>
 
@@ -234,7 +237,9 @@ svg#pp .foreground path.inactive {
         <!-- this is where my discussion goes -->
         <h1 class="page-header">Discussion</h1>
 
-        <p>Here is a big discussion!!!</p>
+        <p>For this assignment, I didn't quite have as much functionality as I might have wished. In general, I wanted to focus on making it so that users could have easier access to the exact values they were looking at. That said, I would like to introduce tooltips to at least the first and third visualization. For the second and third visualizations, additionally, I would like to introduce brushing options so the user can investigate specific subsamples of the data as they please.</p>
+
+        <p>Where possible, I chose to subset my data by region. Representing this by color would, I thought, be a simple way of comparing across various regions the other metrics represented. For the bubble chart, I chose to represent these data points as circles because that allows us to compare across various population values. For the scatterplot, introducing the diagonal allowed me to show the various distributions of values for each feature. For the parallel coordinates chart, I specifically wanted the states on the left size for ease of access to their data.</p>
 
     </div>
 
@@ -350,7 +355,7 @@ svg#pp .foreground path.inactive {
              .data(colorScale.domain())
            .enter().append("g")
              .attr("class", "legend")
-             .attr("transform", function(d, i) { return "translate(0," + i * 25 + ")"; });
+             .attr("transform", function(d, i) { return "translate(0," + i * 21 + ")"; });
 
          // draw legend colored rectangles
          legend.append("circle")
