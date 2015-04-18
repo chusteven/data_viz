@@ -167,58 +167,70 @@ svg#pp .foreground path.inactive {
     <!-- title for homework -->
     <div class="row" style="text-align:center;">
         <h1>Homework 2: A Few Other Charts</h1>
-        <p>This is the page for Steven Chu's second homework assignment for MSAN 622. My source code can be found at my <a href="https://github.com/chusteven/spring-2015-msan622">github respository</a>.</p>
+        <p>This is the page for Steven Chu's second homework assignment for MSAN 622 (Spring 2015). My source code can be found in my <a href="https://github.com/chusteven/spring-2015-msan622">github respository</a>.</p>
     </div>
 
     <!-- bubble plot chart -->
     <div class="row">
         <h2>A Bubble Plot</h2>
+
+        <p>For C-level functionality:</p>
+
+        <ul>
+            <li>Each bubble represents a state</li>
+            <li>The size of the bubble represents that state's population size</li>
+            <br>
+            <li>NB: would like to add tooltip to show exact values</li>
+            <li>NB: would like to create "hover over" option to highlight individual state</li>
+        </ul>
+
         <div class="media-body" id="bubblePlot"></div>
+
     </div>
 
     <!-- scatter plot chart -->
     <div class="row">
         <h2>A Scatterplot</h2>
+
+        <p>For B-level functionality:</p>
+
+        <ul>
+            <li>I'm plotting all numerical features (except frost and area) against each other</li>
+            <li>The colors represent the four different regions of the USA</li>
+            <li>The diagonal represents the distribution of each variable</li>
+            <br>
+            <li>NB: somehow x-axis values aren't showing up properly</li>
+            <li>NB: graphic object is somehow messed up, making it so circles go off plottable area</li>
+            <li>NB: would like to reintroduce brushing option</li>
+        </ul>
+
         <div class="media-body" id="scatterPlot"></div>
+
     </div>
 
     <!-- parallel coordinates plot -->
     <div class="row">
         <h2>A Parallel Coordinates Plot</h2>
+
+        <p>For A-level functionality:</p>
+
+        <ul>
+            <li>Can trace each of the 50 states numerical features</li>
+            <li>Can highlight one state's values at a time</li>
+            <br>
+            <li>NB: somehow can't mouseover state names (like in tutorial)</li>
+            <li>NB: would like to take a stab at the more advanced parallel plot</li>
+        </ul>
+
         <div class="media-body" id="parallelPlot"></div>
+
     </div>    
 
 </div>
 
 <div class="container">
-    <!-- this is where my functionality explanation goes -->
+
     <div class="media-body" id="explanation">
-        <h1 class="page-header">Functionality implemented</h1>
-        
-        <p>For C-level functionality:</p>
-
-        <ul>
-            <li>Thing 1</li>
-            <li>Thing 2</li>
-            <li>Thing 3</li>
-        </ul>
-
-        <p>For B-level functionality:</p>
-
-        <ul>
-            <li>Thing 1</li>
-            <li>Thing 2</li>
-            <li>Thing 3</li>
-        </ul>
-
-        <p>For A-level functionality:</p>
-
-        <ul>
-            <li>Thing 1</li>
-            <li>Thing 2</li>
-            <li>Thing 3</li>
-        </ul>
-
         <!-- this is where my discussion goes -->
         <h1 class="page-header">Discussion</h1>
 
@@ -261,6 +273,7 @@ svg#pp .foreground path.inactive {
         bubbleWidth = 1000 - bubbleMargin.left - bubbleMargin.right,
         bubbleHeight = 600 - bubbleMargin.top - bubbleMargin.bottom;
 
+
     // creating x, y, radius, color scaling functions
     // question: is there a lie factor happening right here?
     // note: the population is the input x, ideally would be reflected in something like a straight line
@@ -287,6 +300,7 @@ svg#pp .foreground path.inactive {
       .append("g")
         .attr("transform", "translate(" + bubbleMargin.left + "," + bubbleMargin.top + ")");
 
+
     // reading in the data and appending the chart and then creating the actual bubbles
     d3.csv("states.csv", function(error, data) {
 
@@ -295,18 +309,16 @@ svg#pp .foreground path.inactive {
         yScale.domain([d3.min(data, function(d) { return cy(d)}), d3.max(data, function(d) { return cy(d)})]).nice();
         radiusScale.domain([0, d3.max(data, function(d) { return radius(d)})]).nice();
 
-        // add x axis (needs label)    
         bubbleChart.append("g")
           .attr("class", "x axis")
           .attr("transform", "translate(0," + bubbleHeight + ")")
           .call(xAxis);
 
-        // add y axis (needs label)
         bubbleChart.append("g")
           .attr("class", "y axis")
           .call(yAxis);
 
-        // Add an x-axis label.
+        // add an x-axis label.
         bubbleChart.append("text")
             .attr("class", "x label")
             .attr("text-anchor", "end")
@@ -314,7 +326,7 @@ svg#pp .foreground path.inactive {
             .attr("y", bubbleHeight - 6)
             .text("income per capita (dollars)");
 
-        // Add a y-axis label.
+        // add a y-axis label.
         bubbleChart.append("text")
             .attr("class", "y label")
             .attr("text-anchor", "end")
@@ -333,6 +345,27 @@ svg#pp .foreground path.inactive {
           .attr("r", function(d) { return radiusScale(radius(d))}) 
           .style("fill", function(d) { return colorScale(color(d))})
           .sort(order);
+
+        var legend = bubbleChart.selectAll(".legend")
+             .data(colorScale.domain())
+           .enter().append("g")
+             .attr("class", "legend")
+             .attr("transform", function(d, i) { return "translate(0," + i * 25 + ")"; });
+
+         // draw legend colored rectangles
+         legend.append("circle")
+             .attr("cx", bubbleWidth - 30)
+             .attr("cy", 10)
+             .attr("r", 10)
+             .style("fill", colorScale);
+
+         // draw legend text
+         legend.append("text")
+             .attr("x", bubbleWidth - 50)
+             .attr("y", 10)
+             .attr("dy", ".35em")
+             .style("text-anchor", "end")
+             .text(function(d) { return d; })
 
     })
 
@@ -355,18 +388,22 @@ svg#pp .foreground path.inactive {
         scatterSize = 150,
         scatterPadding = 19.5;
 
+    // var x = d3.scale.linear()
     var xScatter = d3.scale.linear()
         .range([scatterPadding / 2, scatterSize - scatterPadding / 2]);
 
+    // var y = d3.scale.linear()
     var yScatter = d3.scale.linear()
         .range([scatterSize - scatterPadding / 2, scatterPadding / 2]);
 
     var xAxisScatter = d3.svg.axis()
+        // .scale(x)
         .scale(xScatter)
         .orient("bottom")
         .ticks(5);
 
     var yAxisScatter = d3.svg.axis()
+        // .scale(y)
         .scale(yScatter)
         .orient("left")
         .ticks(5);
@@ -383,24 +420,15 @@ svg#pp .foreground path.inactive {
         domainByTrait[trait] = d3.extent(data, function(d) { return d[trait]; });
       });
 
-      console.log(domainByTrait)
-
       xAxisScatter.tickSize(scatterSize * n);
       yAxisScatter.tickSize(-scatterSize * n);
-
-      // var bubbleChart = d3.select("#bubblePlot").append("svg")
-      //   .attr("id", "bp")
-      //   .attr("width", bubbleWidth + bubbleMargin.left + bubbleMargin.right)
-      //   .attr("height", bubbleHeight + bubbleMargin.top + bubbleMargin.bottom)
-      // .append("g")
-      //   .attr("transform", "translate(" + bubbleMargin.left + "," + bubbleMargin.top + ")");
 
       var scatterPlot = d3.select("#scatterPlot").append("svg")
           .attr("id", "sp")
           .attr("width", scatterSize * n + scatterPadding)
           .attr("height", scatterSize * n + scatterPadding)
         .append("g")
-          .attr("transform", "translate(" + scatterPadding + "," + scatterPadding / 2 + ")");
+          .attr("transform", "translate(" + scatterPadding + "," + (scatterPadding / 2) + ")");
 
       scatterPlot.selectAll(".x.axis")
           .data(traits)
@@ -408,8 +436,8 @@ svg#pp .foreground path.inactive {
           .attr("class", "x axis")
           .attr("transform", function(d, i) { return "translate(" + (n - i - 1) * scatterSize + ",0)"; })
           .each(function(d) { 
-            // console.log("x domain:", domainByTrait[d]); // , "trait:", domainByTrait[i]); 
-            xScatter.domain(domainByTrait[d]); 
+            // x.domain(domainByTrait[d]);
+            xScatter.domain(domainByTrait[d]);
             d3.select(this).call(xAxisScatter); 
         });
 
@@ -419,7 +447,8 @@ svg#pp .foreground path.inactive {
           .attr("class", "y axis")
           .attr("transform", function(d, i) { return "translate(0," + i * scatterSize + ")"; })
           .each(function(d) {
-            yScatter.domain(domainByTrait[d]);
+            // y.domain(domainByTrait[d])
+            yScatter.domain(domainByTrait[d])
             d3.select(this).call(yAxisScatter);
         });
 
@@ -442,6 +471,8 @@ svg#pp .foreground path.inactive {
       function plot(p) {
         var cell = d3.select(this);
 
+        // x.domain(domainByTrait[p.x]);
+        // y.domain(domainByTrait[p.y]);
         xScatter.domain(domainByTrait[p.x]);
         yScatter.domain(domainByTrait[p.y]);
 
@@ -455,6 +486,8 @@ svg#pp .foreground path.inactive {
         cell.selectAll("circle")
             .data(data)
           .enter().append("circle")
+            // .attr("cx", function(d) { return x(d[p.x]); })
+            // .attr("cy", function(d) { return y(d[p.y]); })
             .attr("cx", function(d) { return xScatter(d[p.x]); })
             .attr("cy", function(d) { return yScatter(d[p.y]); })
             .attr("r", 3)
