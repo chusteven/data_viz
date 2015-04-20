@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>MSAN 622 Information Visualization</title>
+
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bootstrap-theme.min.css" rel="stylesheet">
+
+<style type="text/css">
+    body {
+        padding-top: 50px;
+        padding-bottom: 20px;
+    }
+</style>
+
+
+</head>
+
+<body>
+
+<!-- this is defining the style for the objects we will have populating our page -->
+<style>
+
+/* for bubble plots */
+svg#bp .text{
+    font: 10px sans-serif;
+}
+
+svg#bp .dot {
+  stroke: #000;
+  opacity: 0.8;
+}
+
+svg#bp .axis {
+  font: 12px sans-serif;
+}
+
+svg#bp .axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+svg#bp .label {
+  fill: #777;
+}
+
+
+/* for scatter plots */
+svg#sp {
+  font: 10px sans-serif;
+  padding: 10px;
+}
+
+svg#sp .axis,
+.frame {
+  shape-rendering: crispEdges;
+}
+
+svg#sp .axis line {
+  stroke: #ddd;
+}
+
+svg#sp .axis path {
+  display: none;
+}
+
+svg#sp .frame {
+  fill: none;
+  stroke: #aaa;
+}
+
+svg#sp circle {
+  fill-opacity: .7;
+}
+
+
+/* for parallel plots */
+svg#pp {
+  font: 12px sans-serif;
+}
+
+svg#pp .background path {
+  fill: none;
+  stroke: none;
+  stroke-width: 20px;
+  pointer-events: stroke;
+}
+
+svg#pp .foreground path {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+svg#pp .axis .title {
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+svg#pp .axis line, .axis path {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+svg#pp .axis.string {
+  font-size: 6px;
+}
+
+svg#pp .label {
+  -webkit-transition: fill 125ms linear;
+}
+
+svg#pp .active .label:not(.inactive) {
+  font-weight: bold;
+  font-size: 11px;
+}
+
+svg#pp .label.inactive {
+  fill: #ccc;
+}
+
+svg#pp .foreground path.inactive {
+  stroke: #ccc;
+  stroke-opacity: .5;
+  stroke-width: 1px;
+}
+
+</style>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle Navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">MSN 622</a>
+        </div>
+
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="#homework">Homework</a></li>
+                <li><a href="#project">Project</a></li>
+                <li><a href="#participation">Participation</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- title for project dataset site -->
+    <div class="row" style="text-align:center;">
+        <h1>Project Dataset</h1>
+        <p>This page is for Steven Chu's final project's dataset in MSAN 622. Source code can be found in my <a href="https://github.com/chusteven/spring-2015-msan622">github respository</a>.</p>
+    </div>
+
+    <div class="row">
+        <h2>Original Location of the Data</h2>
+
+        <p>Link goes here.</p>
+
+    </div>
+
+    <div class="row">
+        <h2>License Information</h2>
+
+        <p>License information goes here.</p>
+
+    </div>
+
+    <div class="row">
+        <h2>Types of Data?</h2>
+
+        <p>A kind of description of the dataset here.</p>
+
+    </div>    
+
+    <div class="row">
+        <h2>Why Did I Choose this Dataset?</h2>
+
+        <p>An explanation goes here.</p>
+
+    </div>
+
+    <div class="row">
+        <h2>Link to the Dataset</h2>
+
+        <p>Provide a link to the dataset in my github repository here.</p>
+
+    </div>
+
+</div>
+
+<div class="container">
+
+    <div class="media-body" id="explanation">
+        <!-- this is where my discussion goes -->
+        <h1 class="page-header">Discussion</h1>
+
+        <p>For this assignment, I didn't quite have as much functionality as I might have wished. In general, I wanted to focus on making it so that users could have easier access to the exact values they were looking at. That said, I would like to introduce tooltips to at least the first and third visualization. For the second and third visualizations, additionally, I would like to introduce brushing options so the user can investigate specific subsamples of the data as they please.</p>
+
+        <p>Where possible, I chose to subset my data by region. Representing this by color would, I thought, be a simple way of comparing across various regions the other metrics represented. For the bubble chart, I chose to represent these data points as circles because that allows us to compare across various population values. For the scatterplot, introducing the diagonal allowed me to show the various distributions of values for each feature. For the parallel coordinates chart, I specifically wanted the states on the left size for ease of access to their data.</p>
+
+    </div>
+
+</div>
+
+
+<footer>
+    <p style="text-align: center;">Steven Chu &bullet; MSAN 622 Information Visualization &bullet; Spring 2015</p>
+</footer>
+
+</div>
+
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/d3.min.js"></script>
+
+<!-- here is where all my Javascript goes -->
+<script>
+
+</script>
+
+
