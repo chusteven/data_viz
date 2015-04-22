@@ -26,113 +26,6 @@
 <!-- this is defining the style for the objects we will have populating our page -->
 <style>
 
-/* for bubble plots */
-svg#bp .text{
-    font: 10px sans-serif;
-}
-
-svg#bp .dot {
-  stroke: #000;
-  opacity: 0.8;
-}
-
-svg#bp .axis {
-  font: 12px sans-serif;
-}
-
-svg#bp .axis path, .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-svg#bp .label {
-  fill: #777;
-}
-
-
-/* for scatter plots */
-svg#sp {
-  font: 10px sans-serif;
-  padding: 10px;
-}
-
-svg#sp .axis,
-.frame {
-  shape-rendering: crispEdges;
-}
-
-svg#sp .axis line {
-  stroke: #ddd;
-}
-
-svg#sp .axis path {
-  display: none;
-}
-
-svg#sp .frame {
-  fill: none;
-  stroke: #aaa;
-}
-
-svg#sp circle {
-  fill-opacity: .7;
-}
-
-
-/* for parallel plots */
-svg#pp {
-  font: 12px sans-serif;
-}
-
-svg#pp .background path {
-  fill: none;
-  stroke: none;
-  stroke-width: 20px;
-  pointer-events: stroke;
-}
-
-svg#pp .foreground path {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 1.5px;
-}
-
-svg#pp .axis .title {
-  font-size: 11px;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-svg#pp .axis line, .axis path {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-svg#pp .axis.string {
-  font-size: 6px;
-}
-
-svg#pp .label {
-  -webkit-transition: fill 125ms linear;
-}
-
-svg#pp .active .label:not(.inactive) {
-  font-weight: bold;
-  font-size: 11px;
-}
-
-svg#pp .label.inactive {
-  fill: #ccc;
-}
-
-svg#pp .foreground path.inactive {
-  stroke: #ccc;
-  stroke-opacity: .5;
-  stroke-width: 1px;
-}
-
 </style>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -173,35 +66,35 @@ svg#pp .foreground path.inactive {
     <div class="row">
         <h3>Original Location of the Data</h3>
 
-        <p>Link goes here.</p>
+        <p>The original data comes from the Substance Abuse and Mental Health Data Archive website. I am specifically looking at the National Survey on Drug Use and Health from the year 2013. The website for this particular survey can be accessed <a href="http://www.icpsr.umich.edu/icpsrweb/SAMHDA/studies/35509">here</a>.</p>
 
     </div>
 
     <div class="row">
         <h3>License Information</h3>
 
-        <p>License information goes here.</p>
+        <p>The access notes on <a href="http://www.icpsr.umich.edu/icpsrweb/SAMHDA/studies/35509">the webiste for this particular survey</a> states that the data is freely available to the public.</p>
 
     </div>
 
     <div class="row">
         <h3>Types of Data?</h3>
 
-        <p>A kind of description of the dataset here.</p>
+        <p>The features in this data include a good mix of continuous nomial data as well as ordered and unordered ordinal/categorical data.</p>
 
     </div>    
 
     <div class="row">
         <h3>Why Did I Choose this Dataset?</h3>
 
-        <p>An explanation goes here.</p>
+        <p>I am extremely interested in mental health in general, and especially in the USA. I am hoping to understand what sorts of mental health issues certain types of people have, as part of a greater effort of helping those people.</p>
 
     </div>
 
     <div class="row">
         <h3>Link to the Dataset</h3>
 
-        <p>Provide a link to the dataset in my github repository here.</p>
+        <p>A subsetted (2,000 rows) version of the dataset in uploaded in my github repository <a href="https://github.com/chusteven/spring-2015-msan622/blob/gh-pages/projdataset.csv">here</a>.</p>
 
     </div>
 
