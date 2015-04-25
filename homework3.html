@@ -26,111 +26,72 @@
 <!-- this is defining the style for the objects we will have populating our page -->
 <style>
 
-/* for bubble plots */
-svg#bp .text{
-    font: 10px sans-serif;
-}
-
-svg#bp .dot {
-  stroke: #000;
-  opacity: 0.8;
-}
-
-svg#bp .axis {
-  font: 12px sans-serif;
-}
-
-svg#bp .axis path, .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-svg#bp .label {
-  fill: #777;
-}
-
-
-/* for scatter plots */
-svg#sp {
+/*style for multi-line plot*/
+svg#mlp body {
   font: 10px sans-serif;
-  padding: 10px;
 }
 
-svg#sp .axis,
-.frame {
+svg#mlp .axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
   shape-rendering: crispEdges;
 }
 
-svg#sp .axis line {
-  stroke: #ddd;
-}
 
-svg#sp .axis path {
-  display: none;
-}
+/*svg#mlp .x.axis path {*/
+  /*display: none;*/
+/*}*/
 
-svg#sp .frame {
-  fill: none;
-  stroke: #aaa;
-}
-
-svg#sp circle {
-  fill-opacity: .7;
-}
-
-
-/* for parallel plots */
-svg#pp {
-  font: 12px sans-serif;
-}
-
-svg#pp .background path {
-  fill: none;
-  stroke: none;
-  stroke-width: 20px;
-  pointer-events: stroke;
-}
-
-svg#pp .foreground path {
+svg#mlp .line {
   fill: none;
   stroke: steelblue;
   stroke-width: 1.5px;
 }
 
-svg#pp .axis .title {
-  font-size: 11px;
-  font-weight: bold;
-  text-transform: uppercase;
+
+/*style for stacked area plot*/
+svg#sap body {
+  font: 10px sans-serif;
 }
 
-svg#pp .axis line, .axis path {
+svg#sap .axis path,
+.axis line {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
 }
 
-svg#pp .axis.string {
-  font-size: 6px;
+svg#sap .browser text {
+  text-anchor: end;
 }
 
-svg#pp .label {
-  -webkit-transition: fill 125ms linear;
+/* what to do here */
+
+/*
+svg#sap .area {
+  fill: steelblue;
+  clip-path: url(#clip);
+}
+*/
+
+/*.context */
+
+/*svg#sap .area {
+  clip-path: url(#clip);
+}*/
+
+svg#sap .axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
 
-svg#pp .active .label:not(.inactive) {
-  font-weight: bold;
-  font-size: 11px;
-}
-
-svg#pp .label.inactive {
-  fill: #ccc;
-}
-
-svg#pp .foreground path.inactive {
-  stroke: #ccc;
-  stroke-opacity: .5;
-  stroke-width: 1px;
+svg#sap .brush .extent {
+  stroke: #fff;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
 }
 
 </style>
@@ -170,19 +131,29 @@ svg#pp .foreground path.inactive {
         <p>This page is for Steven Chu's third MSAN 622 homework assignment. Source code can be found in my <a href="https://github.com/chusteven/spring-2015-msan622">github respository</a>.</p>
     </div>
 
-    <!-- time series visualization here -->
+</div>
+
+<div class="container">
+
+    <!-- a line plot here -->
     <div class="row">
-        <h2>A Plot Here</h2>
 
-        <div class="media-body" id="timePlot"></div>
+        <h2 class="page-header">A Multi-line Plot</h2>
 
-        <p>For C-level functionality:</p>
+        <p>Here is a line plot with x, y, z functionality...</p>
+        
+        <div class="media-body" id="linePlot"></div>
 
-        <ul>
-            <li>A thing here</li>
-            <li>A thing here</li>
-            <li>A thing here</li>
-        </ul>
+    </div>
+
+    <!-- a stacked plot here -->
+    <div class="row">
+
+        <h2 class="page-header">A Stacked Area Plot of...</h2>
+
+        <p>Here is a stacked area plot with x, y, z functionality...</p>
+
+        <div class="media-body" id="stackedPlot"></div>
 
     </div>
 
@@ -191,8 +162,9 @@ svg#pp .foreground path.inactive {
 <div class="container">
 
     <div class="media-body" id="explanation">
+        
         <!-- this is where my discussion goes -->
-        <h1 class="page-header">Discussion</h1>
+        <h2 class="page-header">Discussion</h1>
 
         <p>A discussion here!</p>
 
@@ -214,6 +186,328 @@ svg#pp .foreground path.inactive {
 <!-- here is where all my Javascript goes -->
 <script>
 
+
+// MULTI-SERIES LINE PLOT
+// margin conventions for width and height
+var marginML = {top: 20, right: 80, bottom: 30, left: 50},
+    widthML = 960 - marginML.left - marginML.right,
+    heightML = 500 - marginML.top - marginML.bottom;
+
+// at first our data is getting treated like string, so need to convert
+// looks like a variable, but actually a function
+var parseDate = d3.time.format("%Y-%m-%d").parse;
+
+// this is now the values of the x-inputs
+var xML = d3.time.scale()
+    .range([0, widthML]);
+
+// same for y axis (remember that we're in a matrix)
+var yML = d3.scale.linear()
+    .range([heightML, 0]);
+
+// this is a color scale variable thing (check out!)
+var colorML = d3.scale.category10();
+
+// same kind of axis construction for x
+var xAxisML = d3.svg.axis()
+    .scale(xML)
+    .orient("bottom");
+
+// same kind of axis construction for y
+var yAxisML = d3.svg.axis()
+    .scale(yML)
+    .orient("left");
+
+// so now we need to actually show lines
+// need data, need to connect data
+// straight line, step function, curve - what kind of path will you show?
+var lineML = d3.svg.line() // line generator
+    .interpolate("basis") // how to interpolate (check out all the different options)
+    .x(function(d) { return xML(d.date); }) // new x function
+    .y(function(d) { return yML(d.killed); }); // new y function
+
+// create the svg as per usual
+var svgML = d3.select("#linePlot").append("svg")
+    .attr("id", "mlp")
+    .attr("width", widthML + marginML.left + marginML.right + 75)
+    .attr("height", heightML + marginML.top + marginML.bottom)
+  .append("g")
+    .attr("transform", "translate(" + marginML.left + "," + marginML.top + ")");
+
+// here is where we load the data file
+d3.csv("drivers.csv", function(error, data) {
+  // what is this crazy thing doing?
+  // well we need to know what the domains are
+  // setting domain of color scale and looking at headers, so will return all but date and give each a different color
+
+  // setting colors for each of these things
+  colorML.domain(d3.keys(data[0]).filter(function(d) { 
+    if (["date","numDrivers","distanceDriven","petrolPrice","vanKilled","law","driversInjured","totalPeopleInjured"].indexOf(d) == -1) { return d };
+   }));
+
+  // taking all date strings, turning them into dates
+  data.forEach(function(d) {
+    d.date = parseDate(d.date);
+  });
+
+
+  // what is happening here?
+  // can use domain to set (when you give it an input, above) or get (when you give it nothing, now)
+  var variables = colorML.domain().map(function(name) { // aplies this function to all of these functions to generate another array
+    return {
+      name: name,
+      values: data.map(function(d) {
+        return {date: d.date, killed: +d[name]};
+      })
+    };
+  });
+
+  // what's happening here?
+  // setting domain, d3.extent is shortcut for doing d3.min and d3.max at the same time
+  xML.domain(d3.extent(data, function(d) { return d.date; }));
+
+  // what is happening right now right here??
+  // need min and max of NY, AU, SF, and also of all three?
+  // this is the crazy way of how to do this in JavaScript
+  yML.domain([0, d3.max(variables, function(c) { return d3.max(c.values, function(v) { return v.killed; }); })]);
+
+  // drawing x-axis
+  svgML.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + heightML + ")")
+      .call(xAxisML);
+
+  // drawing y-axis as well as text for temperature
+  svgML.append("g")
+      .attr("class", "y axis")
+      .call(yAxisML)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6) 
+      .attr("dy", ".71em")
+      .attr( "fill-opacity", 0.7)
+      .style("text-anchor", "end")
+      .text("Number of People Killed");
+
+  // what is happening here?
+  var variable = svgML.selectAll(".variable")
+      .data(variables)
+    .enter().append("g")
+      .attr("class", "variable");
+
+  // what is happening here?
+  // clipped path thing
+  variable.append("clipPath")
+      .attr("id", "clip")
+    .append("rect")
+      .attr("width", widthML)
+      .attr("height", heightML);
+
+  // actually creating the lines
+  variable.append("path")
+      .attr("class", "line")
+      .attr("clip-path", "url(#clip)")
+      .attr("d", function(d) { return lineML(d.values); })
+      .style("stroke", function(d) { return colorML(d.name); })
+      .call;
+
+  // new variable names here
+  var variableNames = {"frontKilled": "Front-Seat Passengers",
+                        "rearKilled": "Rear-Seat Passengers",
+                        "driversKilled": "Drivers"}
+
+  // figures out where is y value at end of series and draw the text at the end of that
+  variable.append("text")
+      .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+      .attr("transform", function(d) { return "translate(" + xML(d.value.date) + "," + yML(d.value.killed) + ")"; })
+      .attr("x", 3)
+      .attr("dy", ".35em")
+      .text(function(d) { return variableNames[d.name]; });
+
+});
+
+
+
+// STACKED AREA PLOT
+
+var marginSA = {top: 10, right: 10, bottom: 100, left: 40}, // margins for focus plot
+    marginSA2 = {top: 430, right: 10, bottom: 20, left: 40}, // margins for context plot
+    widthSA = 960 - marginSA.left - marginSA.right,
+    heightSA = 500 - marginSA.top - marginSA.bottom,
+    heightSA2 = 500 - marginSA2.top - marginSA2.bottom;
+
+// var marginSA = {top: 20, right: 20, bottom: 30, left: 50},
+//     widthSA = 960 - marginSA.left - marginSA.right,
+//     heightSA = 500 - marginSA.top - marginSA.bottom;
+
+var xSA = d3.time.scale().range([0, widthSA]),
+    xSA2 = d3.time.scale().range([0, widthSA]),
+    ySA = d3.scale.linear().range([heightSA, 0]),
+    ySA2 = d3.scale.linear().range([heightSA2, 0]);
+
+// var xSA = d3.time.scale()
+//     .range([0, widthSA]);
+
+// var ySA = d3.scale.linear()
+//     .range([heightSA, 0]);
+
+var colorSA = d3.scale.category20();
+
+var xAxisSA = d3.svg.axis().scale(xSA).orient("bottom"),
+    xAxisSA2 = d3.svg.axis().scale(xSA2).orient("bottom"),
+    yAxisSA = d3.svg.axis().scale(ySA).orient("left");
+
+var brush = d3.svg.brush()
+    .x(xSA2)
+    .on("brush", brushed);
+
+// var xAxisSA = d3.svg.axis()
+//     .scale(xSA)
+//     .orient("bottom");
+
+// var yAxisSA = d3.svg.axis()
+//     .scale(ySA)
+//     .orient("left");
+
+var areaSA = d3.svg.area()
+    .interpolate("basis")
+    .x(function(d) { return xSA(d.date); })
+    .y0(function(d) { return ySA(d.y0); })
+    .y1(function(d) { return ySA(d.y0 + d.y); });
+
+var areaSA2 = d3.svg.area()
+    .interpolate("basis")
+    .x(function(d) { return xSA2(d.date); })
+    .y0(function(d) { return ySA(d.y0); })
+    .y1(function(d) { return ySA2(d.price); });
+
+var stackSA = d3.layout.stack()
+    .values(function(d) { return d.values; })
+
+var svgSA = d3.select("#stackedPlot").append("svg")
+    .attr("id", "sap")
+    .attr("width", widthSA + marginSA.left + marginSA.right + 125)
+    .attr("height", heightSA + marginSA.top + marginSA.bottom)
+  .append("g")
+    .attr("transform", "translate(" + marginSA.left + "," + marginSA.top + ")");
+
+svgSA.append("defs").append("clipPath")
+    .attr("id", "clip")
+  .append("rect")
+    .attr("width", widthSA)
+    .attr("height", heightSA);
+
+// here is where margins come into play...
+var focus = svgSA.append("g")
+    .attr("class", "focus")
+    .attr("transform", "translate(" + marginSA.left + "," + marginSA.top + ")");
+
+// here is where margins come into play...
+var context = svgSA.append("g")
+    .attr("class", "context")
+    .attr("transform", "translate(" + marginSA2.left + "," + marginSA2.top + ")");
+
+d3.csv("drivers.csv", function(error, data) {
+  
+  data.forEach(function(d) {
+    d.date = parseDate(d.date);
+  });
+
+  colorSA.domain(["frontKilled", "rearKilled", "driversKilled"]) // same thing
+
+  var deaths = stackSA(colorSA.domain().map(function(name) {
+    return {
+      name: name,
+      values: data.map(function(d) {
+        return {date: d.date, y: +d[name]};
+      })
+    };
+  }));
+
+  // console.log(deaths)
+
+  xSA.domain(d3.extent(data, function(d) { return d.date; }));
+  ySA.domain([0, 2000]);
+
+  // CHANGES
+  xSA2.domain(xSA.domain());
+  ySA2.domain(ySA.domain());
+
+  // CHANGES
+  focus.append("path")
+      .datum(data)
+      .attr("class", "area")
+      .attr("d", areaSA);
+
+  focus.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + heightSA + ")")
+      .call(xAxisSA);
+
+  focus.append("g")
+      .attr("class", "y axis")
+      .call(yAxisSA);
+
+  context.append("path")
+      .datum(data)
+      .attr("class", "area")
+      .attr("d", areaSA2);
+
+  context.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + heightSA2 + ")")
+      .call(xAxisSA2);
+
+  context.append("g")
+        .attr("class", "x brush")
+        .call(brush)
+      .selectAll("rect")
+        .attr("y", -6)
+        .attr("height", heightSA2 + 7);
+
+
+  var death = svgSA.selectAll(".death")
+      .data(deaths)
+    .enter().append("g")
+      .attr("class", "death");
+
+  death.append("path")
+      .attr("class", "area")
+      .attr("d", function(d) { return areaSA(d.values); })
+      .style("fill", function(d) { return colorSA(d.name); });
+
+  var variableNames = {"frontKilled": "Front-Seat Passengers",
+                      "rearKilled": "Rear-Seat Passengers",
+                      "driversKilled": "Drivers"};
+
+  death.append("text")
+      .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+      .attr("transform", function(d) { return "translate(" + xSA(d.value.date) + "," + ySA(d.value.y0 + d.value.y / 2) + ")"; })
+      .attr("x", 1)
+      .attr("dy", ".35em")
+      .text(function(d) { return variableNames[d.name]; });
+
+  svgSA.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + heightSA + ")")
+      .call(xAxisSA);
+
+  svgSA.append("g")
+      .attr("class", "y axis")
+      .call(yAxisSA);
+});
+
+// this function is really what we want to know about
+function brushed() {
+  x.domain(brush.empty() ? x2.domain() : brush.extent()); // new domain in focus value: here is figuring out what area you brushed over
+  focus.select(".area").attr("d", area); // makes it so area updates properly
+  focus.select(".x.axis").call(xAxis); // makes it so x axis updates properly
+}
+
+function type(d) {
+  d.date = parseDate(d.date);
+  d.price = +d.price;
+  return d;
+}
+
 </script>
-
-

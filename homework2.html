@@ -422,7 +422,7 @@ svg#pp .foreground path.inactive {
       n = traits.length;
 
       traits.forEach(function(trait) {
-        domainByTrait[trait] = d3.extent(data, function(d) { return d[trait]; });
+        domainByTrait[trait] = d3.extent(data, function(d) { return +d[trait]; });
       });
 
       xAxisScatter.tickSize(scatterSize * n);
