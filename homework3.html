@@ -38,17 +38,11 @@ svg#mlp .axis path,
   shape-rendering: crispEdges;
 }
 
-
-/*svg#mlp .x.axis path {*/
-  /*display: none;*/
-/*}*/
-
 svg#mlp .line {
   fill: none;
   stroke: steelblue;
   stroke-width: 1.5px;
 }
-
 
 /*style for stacked area plot*/
 svg#sap body {
@@ -66,20 +60,6 @@ svg#sap .browser text {
   text-anchor: end;
 }
 
-/* what to do here */
-
-/*
-svg#sap .area {
-  fill: steelblue;
-  clip-path: url(#clip);
-}
-*/
-
-/*.context */
-
-/*svg#sap .area {
-  clip-path: url(#clip);
-}*/
 
 svg#sap .axis path,
 .axis line {
@@ -128,7 +108,7 @@ svg#sap .brush .extent {
     <!-- title for homework -->
     <div class="row" style="text-align:center;">
         <h1>Homework 3: Time Series Data Visualization</h1>
-        <p>This page is for Steven Chu's third MSAN 622 homework assignment. Source code can be found in my <a href="https://github.com/chusteven/spring-2015-msan622">github respository</a>.</p>
+        <p>This page is for Steven Chu's third MSAN 622 homework assignment. Source code can be found in my <a href="https://github.com/chusteven/spring-2015-msan622/blob/gh-pages/homework3.html">github respository</a>.</p>
     </div>
 
 </div>
@@ -138,9 +118,9 @@ svg#sap .brush .extent {
     <!-- a line plot here -->
     <div class="row">
 
-        <h2 class="page-header">A Multi-line Plot</h2>
+        <h2 class="page-header">A Multi-Line Plot of Drivers, Front, and Rear-Seat Passengers Killed Over Time</h2>
 
-        <p>Here is a line plot with x, y, z functionality...</p>
+        <p>This plot has no interactivity. I would have liked to include a tooltip for details-on-demand to show exact values, but did not.</p>
         
         <div class="media-body" id="linePlot"></div>
 
@@ -149,9 +129,9 @@ svg#sap .brush .extent {
     <!-- a stacked plot here -->
     <div class="row">
 
-        <h2 class="page-header">A Stacked Area Plot of...</h2>
+        <h2 class="page-header">A Stacked Area Plot of Drivers, Front, and Rear-Seat Passengers Killed Over Time</h2>
 
-        <p>Here is a stacked area plot with x, y, z functionality...</p>
+        <p>This plot features brushing as well as panning. To brush, simply click on the focus region of the plot, click, and drag until you have a desired time-frame you wish to analyze. To pan, click on that rectangular section and drag to whatever particular time you wish to analyze.</p>
 
         <div class="media-body" id="stackedPlot"></div>
 
@@ -166,7 +146,7 @@ svg#sap .brush .extent {
         <!-- this is where my discussion goes -->
         <h2 class="page-header">Discussion</h1>
 
-        <p>A discussion here!</p>
+        <p>These time-series plots are to indicate trends over time in the "Seatbelts" dataset native to R. The first thing I did was preprocess the data to format the dates. I then exported the dataframe as a csv file. I chose the colors particularly to make every element stand out as individually as possible. Because we have only discrete data points, there is some amount of lie factor associated with each of these plots. The data-ink as well as data-density values are about as good as can be expected in this sort of visualization. Though I was unable to add certain levels of functionality desired, I was pleased with the brushing/panning in the stacked area plot. I will continue to work on developing smart tooltips for the details-on-demand interactivity.</p>
 
     </div>
 
@@ -329,12 +309,14 @@ d3.csv("drivers.csv", function(error, data) {
 
 
 // STACKED AREA PLOT
-var marginSA = {top: 10, right: 10, bottom: 100, left: 40},
-    marginSA2 = {top: 430, right: 10, bottom: 20, left: 40},
+// setting margins for both context as well as focus plots
+var marginSA = {top: 40, right: 10, bottom: 100, left: 50},
+    marginSA2 = {top: 430, right: 10, bottom: 20, left: 50},
     widthSA = 960 - marginSA.left - marginSA.right,
     heightSA = 500 - marginSA.top - marginSA.bottom,
     heightSA2 = 500 - marginSA2.top - marginSA2.bottom;
 
+// these are the x and y-values of the plots
 var xSA = d3.time.scale().range([0, widthSA]),
     xSA2 = d3.time.scale().range([0, widthSA]),
     ySA = d3.scale.linear().range([heightSA, 0]),
@@ -418,7 +400,6 @@ d3.csv("drivers.csv", function(error, data) {
     .attr('class', 'focus')
     .style("fill", function(d) { return colorSA(d.name); });
 
-
   focus.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + heightSA + ")")
@@ -426,7 +407,14 @@ d3.csv("drivers.csv", function(error, data) {
 
   focus.append("g")
       .attr("class", "y axis")
-      .call(yAxisSA);
+      .call(yAxisSA)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6) 
+      .attr("dy", ".71em")
+      .attr( "fill-opacity", 0.7)
+      .style("text-anchor", "end")
+      .text("Number of People Killed");
 
   context.selectAll("path")
     .data(deaths)
@@ -434,7 +422,6 @@ d3.csv("drivers.csv", function(error, data) {
     .attr('class', 'context')
     .attr("d", function(d) { return areaSA2(d.values); })
     .style("fill", function(d) { return colorSA(d.name); });
-
 
   context.append("g")
       .attr("class", "x axis")
@@ -448,37 +435,44 @@ d3.csv("drivers.csv", function(error, data) {
         .attr("y", 1)
         .attr("height", heightSA2 + 7);
 
+  columns = ["frontKilled", "rearKilled", "driversKilled"]
 
-  // var death = svgSA.selectAll(".death")
-  // var death = svgSA.selectAll(".death")
-  //     .data(deaths)
-  //   .enter().append("g")
-  //     .attr("class", "death");
+  color_div = {}
 
-  // death.append("path")
-  //     .attr("class", "area")
-  //     .attr("d", function(d) { return areaSA(d.values); })
-  //     .style("fill", function(d) { return colorSA(d.name); });
+  for  (var i = 0; i < columns.length; i++)
+  {
+      color_div[columns[i]] = colorSA(columns[i]);
+  };
 
-  var variableNames = {"frontKilled": "Front-Seat Passengers",
-                      "rearKilled": "Rear-Seat Passengers",
-                      "driversKilled": "Drivers"};
+  var legendSize = 12;
+  var legendSpace = 120;
+  var colors = d3.entries(color_div)
 
-  // death.append("text")
-  //     .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-  //     .attr("transform", function(d) { return "translate(" + xSA(d.value.date) + "," + ySA(d.value.y0 + d.value.y / 2) + ")"; })
-  //     .attr("x", 1)
-  //     .attr("dy", ".35em")
-  //     .text(function(d) { return variableNames[d.name]; });
+  var legend = svgSA.selectAll('.legend')
+      .data(colors)
+      .enter()
+      .append('g')
+      .attr('class', 'legend')
+      .attr('transform', function(d, i) { 
+        return 'translate(' + (300 + (i * (legendSize + legendSpace))) + ',' + 10 + ')';
+        });
 
-  // svgSA.append("g")
-  //     .attr("class", "x axis")
-  //     .attr("transform", "translate(0," + heightSA + ")")
-  //     .call(xAxisSA);
+  legend.append('rect')
+      .attr('width', legendSize)
+      .attr('height', legendSize)
+      .style('fill', function(d) { return d.value; })
+      .style('opacity', 1)
+      .style('stroke', 'black')
+      .style('stroke-width', '.5px');
 
-  // svgSA.append("g")
-  //     .attr("class", "y axis")
-  //     .call(yAxisSA);
+  legend.append('text')
+      .attr('x', legendSize + 4)
+      .attr('y', legendSize - 2)
+      .text(function(d) { 
+        if (d.key == "frontKilled"){ return "Front Passengers"; }
+        else if (d.key == "rearKilled"){ return "Rear Passengers"; }
+        else { return "Automobile Drivers"; }; });
+
 });
 
 // this function is really what we want to know about
@@ -487,11 +481,5 @@ function brushed() {
   focus.selectAll("path.focus").attr("d", function(d) { return areaSA(d.values); }); // makes it so area updates properly
   focus.select(".x.axis").call(xAxisSA); // makes it so x axis updates properly
 }
-
-// function type(d) {
-//   d.date = parseDate(d.date);
-//   d.price = +d.price;
-//   return d;
-// }
 
 </script>
