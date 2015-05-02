@@ -26,53 +26,32 @@
 <!-- this is defining the style for the objects we will have populating our page -->
 <style>
 
-/*style for multi-line plot*/
-svg#mlp body {
+svg {
+    background-color: steelblue;
+    margin: 1px;
+    /*think about what this does - basically a kind of wrapping*/
+    float: left;
+}
+
+svg#barlength body {
   font: 10px sans-serif;
 }
 
-svg#mlp .axis path,
+svg#barlength .axis path,
 .axis line {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
 }
 
-svg#mlp .line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 1.5px;
+svg#barlength .bar {
+  fill: steelblue;
 }
 
-/*style for stacked area plot*/
-svg#sap body {
-  font: 10px sans-serif;
+svg#barlength .x.axis path {
+  display: none;
 }
 
-svg#sap .axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-svg#sap .browser text {
-  text-anchor: end;
-}
-
-
-svg#sap .axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-svg#sap .brush .extent {
-  stroke: #fff;
-  fill-opacity: .125;
-  shape-rendering: crispEdges;
-}
 
 </style>
 
@@ -127,6 +106,10 @@ svg#sap .brush .extent {
 
     </div>
 
+</div>
+
+<div class="container">
+
     <div class="row">
 
         <div class="media-body" id="basic">
@@ -134,6 +117,32 @@ svg#sap .brush .extent {
             <h2 class="page-header">Basic Functionality</h2>
 
             <p>Here is a description of the basic functionality I implemented.</p>
+
+            <script type='text/javascript' src='https://public.tableau.com/javascripts/api/viz_v1.js'></script>
+
+                <div class='tableauPlaceholder' style='width: 940px; height: 550px;'>
+                    <noscript>
+                        <a href='#'>
+                            <img alt='Dashboard 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;ho&#47;homework4_2&#47;Dashboard1&#47;1_rss.png' style='border: none' />
+                        </a>
+                    </noscript>
+                    <object class='tableauViz' width='944' height='551' style='display:none;'>
+                    <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> 
+                    <param name='site_root' value='' />
+                    <param name='name' value='homework4_2&#47;Dashboard1' />
+                    <param name='tabs' value='no' />
+                    <param name='toolbar' value='yes' />
+                    <param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;ho&#47;homework4_2&#47;Dashboard1&#47;1.png' /> 
+                    <param name='animate_transition' value='yes' />
+                    <param name='display_static_image' value='yes' />
+                    <param name='display_spinner' value='yes' />
+                    <param name='display_overlay' value='yes' />
+                    <param name='display_count' value='yes' />
+                    <param name='showVizHome' value='no' />
+                    <param name='showTabs' value='y' />
+                    <param name='bootstrapWhenNotified' value='true' />
+                </object>
+            </div>
 
         </div>
 
@@ -147,11 +156,18 @@ svg#sap .brush .extent {
 
             <p>Here is a description of the moderate functionality I implemented.</p>
 
+                <div id="block">
+                    <svg id="barlength" class="med" width="10" height="10"></svg>
+                    <svg id="avgvotes" class="medsmall" width="10" height="10"></svg>
+                    <svg id="barbudget" class="med" width="10" height="10"></svg>
+                    <svg id="avgrating" class="medsmall" width="10" height="10"></svg>
+                </div>
+
         </div>
 
     </div>
 
-    <div class="row">
+    <!-- <div class="row">
 
         <div class="media-body" id="advanced">
 
@@ -159,9 +175,16 @@ svg#sap .brush .extent {
 
             <p>Here is a description of the advanced functionality I implemented.</p>
 
+                <div id="block">
+                    <svg id="barlength" class="med" width="10" height="10"></svg>
+                    <svg id="avgvotes" class="medsmall" width="10" height="10"></svg>
+                    <svg id="barbudget" class="med" width="10" height="10"></svg>
+                    <svg id="avgrating" class="medsmall" width="10" height="10"></svg>
+                </div>
+
         </div>
 
-    </div>
+    </div> -->
 
 </div>
 
@@ -219,9 +242,20 @@ svg#sap .brush .extent {
 // helpful link for prototyping dashboard in Tableau
 // http://onlinehelp.tableau.com/v9.0/public/online/mac/en-us/help.htm#dashboards.html
 
+// select SVG by ID using "#"
+d3.selectAll("svg.med")
+    .attr("width", 540)
+    .attr("height", 225);
+
+// select SVGs by Class using "."
+d3.selectAll("svg.medsmall")
+    .attr("width", 400)
+    .attr("height", 225);
 
 
 
+// http://bl.ocks.org/mbostock/3883245
+// http://bl.ocks.org/mbostock/3887051
 
 
 </script>
