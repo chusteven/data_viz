@@ -26,13 +26,6 @@
 <!-- this is defining the style for the objects we will have populating our page -->
 <style>
 
-/*svg.medsmall {
-    background-color: steelblue;
-    margin: 1px;
-    think about what this does - basically a kind of wrapping
-    float: left;
-}*/
-
 
 /*for bar chart of lengths*/
 svg#barlength body {
@@ -86,6 +79,30 @@ svg#barbudget .x.axis path {
 }
 
 
+/*for line chart of average rating*/
+svg#avgrating body {
+  font: 10px sans-serif;
+}
+
+svg#avgrating .axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+svg#avgrating .axis text {
+    font-family: sans-serif;
+    font-size: 10px;
+}
+
+svg#avgrating .line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+
 /*for line chart of average votes*/
 svg#avgvotes body {
   font: 10px sans-serif;
@@ -98,8 +115,9 @@ svg#avgvotes .axis path,
   shape-rendering: crispEdges;
 }
 
-svg#avgvotes .x.axis path {
-  display: none;
+svg#avgvotes .axis text {
+    font-family: sans-serif;
+    font-size: 10px;
 }
 
 svg#avgvotes .line {
@@ -155,7 +173,7 @@ svg#avgvotes .line {
 
             <h2 class="page-header">A Brief User Guide</h2>
 
-            <p>Here is a description of how the user should engage with the following visualizations.</p>
+            <p>The following visualizations are somewhat straightforward in terms of how to interact with them. The basic visualization has simple honver-over options to display exact values. The moderate functionality has no interactivity, however.</p>
 
         </div>
 
@@ -171,7 +189,7 @@ svg#avgvotes .line {
 
             <h2 class="page-header">Basic Functionality</h2>
 
-            <p>Here is a description of the basic functionality I implemented.</p>
+            <p>The following visualization was implemented in Tableau Public.</p>
 
             <script type='text/javascript' src='https://public.tableau.com/javascripts/api/viz_v1.js'></script>
 
@@ -209,7 +227,7 @@ svg#avgvotes .line {
 
             <h2 class="page-header">Moderate Functionality</h2>
 
-            <p>Here is a description of the moderate functionality I implemented.</p>
+            <p>The two graphs on the left are simple grouped bar charts, while the two graphs on the right are simple line charts of average metrics per year.</p>
 
                 <div id="block">
                     <svg id="barlength" class="med" width="10" height="10"></svg>
@@ -232,7 +250,7 @@ svg#avgvotes .line {
             
             <h2 class="page-header">Pre-Processing</h1>
 
-            <p>Here is a discussion of the pre-processing of the data.</p>
+            <p>I used R to preprocess the data so as to get rid of rows that didn't have any information in the budget column. To get the metrics in a more easily-accessible format for D3, I imported the dataset resulting from the R cleaning into a MySQL server and ran a few aggregate functions.</p>
 
         </div>
 
@@ -244,7 +262,9 @@ svg#avgvotes .line {
             
             <h2 class="page-header">Discussion</h1>
 
-            <p>Here is a discussion of the choices I made regarding my visualization.</p>
+            <p>I chose to visualize the information as presented above so as to capture information on a per-genre basis. For the two time-series plots, I wanted to break those line charts into multi-line charts - again, on a per-genre basis, with the added option of filtering. Furthermore, I chose to represent votes and ratings right above one another to make quick comparisons. There may have been a year that received a high average rating but had a relatively low average number of votes. I wanted to make these comparisons easy to make. As far as the grouped bar plots go, I chose the two colors so as to contrast the two groups.</p>
+
+            <p>I think that my ultimate goal was to make all the graphs interact with each other. I was hoping that by selecting one genre at a time, I would be able to fade out all the other information on all the other graphs, so as to make quick comparisons between the various graphs. In any case, this is an opportunity I suppose I can explore another time.</p>
 
         </div>
 
@@ -265,14 +285,6 @@ svg#avgvotes .line {
 
 <script>
 
-// goal: need 3 panels and at least 2 different techniques
-
-// you are primarily prototyping the techniques and layout you plan to use, 
-// and which variables/columns from the dataset you'll include in each visualization panel
-// you need to think about the interactivity you want to add between panels,
-// but do not need to implement that interactivity in your prototype
-// make sure you link to this prototype (or embed it) on your submission website!
-
 
 
 // helpful link for prototyping dashboard in Tableau
@@ -285,9 +297,9 @@ d3.selectAll("svg.med")
 
 // select SVGs by Class using "."
 d3.selectAll("svg.medsmall")
-    .attr("background-color", "steelblue")
     .attr("width", 400)
     .attr("height", 225);
+
 
 
 // GROUPED BAR CHARTS - length by genre
@@ -297,7 +309,7 @@ var marginbarl = {top: 20, right: 20, bottom: 30, left: 40},
     heightbarl = 225 - marginbarl.top - marginbarl.bottom;
 
 var x0barl = d3.scale.ordinal()
-    .rangeRoundBands([0, widthbarl], 0.05, 0.25);
+    .rangeRoundBands([0, widthbarl], 0.1, 0.2);
 
 var x1barl = d3.scale.ordinal();
 
@@ -313,7 +325,7 @@ var xAxisbarl = d3.svg.axis()
 var yAxisbarl = d3.svg.axis()
     .scale(ybarl)
     .orient("left")
-    .tickFormat(d3.format("d"));    
+    .tickFormat(d3.format("d"));
 
 var svgbarl = d3.select("#barlength")
   .append("g")
@@ -329,9 +341,9 @@ d3.csv("genrebudgetlengths.csv", function(error, data) {
   x0barl.domain(data.map(function(d) { return d.Genre; }));
   
   x1barl.domain(yesnobarl)
-    .rangeRoundBands([0, x0barl.rangeBand()], 0.05, 0.25);
+    .rangeRoundBands([0, x0barl.rangeBand()], 0.1, 0.2);
 
-  ybarl.domain([0, d3.max(data, function(d) { return d3.max(d.genres, function(d) { return d.value; }); }) + 30]).nice();
+  ybarl.domain([0, d3.max(data, function(d) { return d3.max(d.genres, function(d) { return d.value; }); }) + 20]).nice();
 
   svgbarl.append("g")
       .attr("class", "x axis")
@@ -368,18 +380,19 @@ d3.csv("genrebudgetlengths.csv", function(error, data) {
       .data(yesnobarl.slice().reverse())
     .enter().append("g")
       .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+      .attr("transform", function(d, i) { return "translate(0," + i * 12 + ")"; });
 
   legendbarl.append("rect")
       .attr("x", widthbarl - 18)
-      .attr("width", 18)
-      .attr("height", 18)
+      .attr("width", 10)
+      .attr("height", 10)
       .style("fill", colorbarl);
 
   legendbarl.append("text")
-      .attr("x", widthbarl - 24)
-      .attr("y", 9)
+      .attr("x", widthbarl - 20)
+      .attr("y", 5)
       .attr("dy", ".35em")
+      .style("font-size","10px")
       .style("text-anchor", "end")
       .style("opacity", 0.7)
       .text(function(d) {
@@ -399,7 +412,7 @@ var marginbarb = {top: 20, right: 20, bottom: 30, left: 40},
     heightbarb = 225 - marginbarb.top - marginbarb.bottom;
 
 var x0barb = d3.scale.ordinal()
-    .rangeRoundBands([0, widthbarb], 0.05, 0.25);
+    .rangeRoundBands([0, widthbarb], 0.1, 0.2);
 
 var x1barb = d3.scale.ordinal();
 
@@ -431,7 +444,7 @@ d3.csv("genrebudgetlengths.csv", function(error, data) {
   x0barb.domain(data.map(function(d) { return d.Genre; }));
   
   x1barb.domain(yesnobarb)
-    .rangeRoundBands([0, x0barb.rangeBand()], 0.05, 0.25);
+    .rangeRoundBands([0, x0barb.rangeBand()], 0.1, 0.2);
 
   ybarb.domain([0, d3.max(data, function(d) { return d3.max(d.budgets, function(d) { return d.value; }); })]).nice();
 
@@ -470,18 +483,19 @@ d3.csv("genrebudgetlengths.csv", function(error, data) {
       .data(yesnobarb.slice().reverse())
     .enter().append("g")
       .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+      .attr("transform", function(d, i) { return "translate(0," + i * 12 + ")"; });
 
   legendbarb.append("rect")
       .attr("x", widthbarb - 18)
-      .attr("width", 18)
-      .attr("height", 18)
+      .attr("width", 10)
+      .attr("height", 10)
       .style("fill", colorbarb);
 
   legendbarb.append("text")
-      .attr("x", widthbarb - 24)
-      .attr("y", 9)
+      .attr("x", widthbarb - 20)
+      .attr("y", 5)
       .attr("dy", ".35em")
+      .style("font-size","10px")
       .style("text-anchor", "end")
       .style("opacity", 0.7)
       .text(function(d) {
@@ -492,7 +506,130 @@ d3.csv("genrebudgetlengths.csv", function(error, data) {
 });
 
 
+
+// TIME-SERIES PLOT - AVERAGE VOTES PER YEAR
 // http://bl.ocks.org/mbostock/3883245
+var marginlpv = {top: 20, right: 20, bottom: 30, left: 50},
+    widthlpv = 400 - marginlpv.left - marginlpv.right,
+    heightlpv = 225 - marginlpv.top - marginlpv.bottom;
+
+var xlpv = d3.scale.linear()
+    .range([0, widthlpv]);
+
+var ylpv = d3.scale.linear()
+    .range([heightlpv, 0]);
+
+var xAxislpv = d3.svg.axis()
+    .scale(xlpv)
+    .orient("bottom")
+    .tickFormat(d3.format("d"));
+
+var yAxislpv = d3.svg.axis()
+    .scale(ylpv)
+    .orient("left");
+
+var linelpv = d3.svg.line()
+    .x(function(d) { return xlpv(d.year); })
+    .y(function(d) { return ylpv(d.avgVotes); });
+
+var svglpv = d3.select("#avgvotes")
+  .append("g")
+    .attr("transform", "translate(" + marginlpv.left + "," + marginlpv.top + ")");
+
+d3.csv("ratingvotesbyyear.csv", function(error, data) {
+  data.forEach(function(d) {
+    d.year = +d.year;
+    d.avgVotes = +d.avgVotes;
+  });
+
+  xlpv.domain(d3.extent(data, function(d) { return d.year; })).nice();
+  ylpv.domain(d3.extent(data, function(d) { return d.avgVotes; })).nice();
+
+  svglpv.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + heightlpv + ")")
+      .call(xAxislpv);
+
+  svglpv.append("g")
+      .attr("class", "y axis")
+      .call(yAxislpv)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .style("opacity", 0.7)
+      .text("average number votes");
+
+  svglpv.append("path")
+      .datum(data)
+      .attr("class", "line")
+      .attr("d", linelpv);
+});
+
+
+
+// TIME-SERIES PLOT - AVERAGE RATING PER YEAR
+// http://bl.ocks.org/mbostock/3883245
+var marginlpr = {top: 20, right: 20, bottom: 30, left: 50},
+    widthlpr = 400 - marginlpr.left - marginlpr.right,
+    heightlpr = 225 - marginlpr.top - marginlpr.bottom;
+
+
+var xlpr = d3.scale.linear()
+    .range([0, widthlpr]);
+
+var ylpr = d3.scale.linear()
+    .range([heightlpr, 0]);
+
+var xAxislpr = d3.svg.axis()
+    .scale(xlpr)
+    .orient("bottom")
+    .tickFormat(d3.format("d"));
+
+var yAxislpr = d3.svg.axis()
+    .scale(ylpr)
+    .orient("left");
+
+var linelpr = d3.svg.line()
+    .x(function(d) { return xlpr(d.year); })
+    .y(function(d) { return ylpr(d.avgRating); });
+
+var svglpr = d3.select("#avgrating")
+  .append("g")
+    .attr("transform", "translate(" + marginlpr.left + "," + marginlpr.top + ")");
+
+d3.csv("ratingvotesbyyear.csv", function(error, data) {
+  data.forEach(function(d) {
+    d.year = +d.year;
+    d.avgRating = +d.avgRating;
+  });
+
+  xlpr.domain(d3.extent(data, function(d) { return d.year; })).nice();
+  ylpr.domain([0,10]).nice();
+
+  svglpr.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + heightlpr + ")")
+      .call(xAxislpr);
+
+  svglpr.append("g")
+      .attr("class", "y axis")
+      .call(yAxislpr)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .style("opacity", 0.7)
+      .text("average rating");
+
+  svglpr.append("path")
+      .datum(data)
+      .attr("class", "line")
+      .attr("d", linelpr);
+});
+
 
 
 </script>
