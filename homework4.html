@@ -26,13 +26,15 @@
 <!-- this is defining the style for the objects we will have populating our page -->
 <style>
 
-svg {
+/*svg.medsmall {
     background-color: steelblue;
     margin: 1px;
-    /*think about what this does - basically a kind of wrapping*/
+    think about what this does - basically a kind of wrapping
     float: left;
-}
+}*/
 
+
+/*for bar chart of lengths*/
 svg#barlength body {
   font: 10px sans-serif;
 }
@@ -44,6 +46,11 @@ svg#barlength .axis path,
   shape-rendering: crispEdges;
 }
 
+svg#barlength .axis text {
+    font-family: sans-serif;
+    font-size: 10px;
+}
+
 svg#barlength .bar {
   fill: steelblue;
 }
@@ -52,6 +59,54 @@ svg#barlength .x.axis path {
   display: none;
 }
 
+
+/*for bar chart of budgets*/
+svg#barbudget body {
+  font: 10px sans-serif;
+}
+
+svg#barbudget .axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+svg#barbudget .axis text {
+    font-family: sans-serif;
+    font-size: 10px;
+}
+
+svg#barbudget .bar {
+  fill: steelblue;
+}
+
+svg#barbudget .x.axis path {
+  display: none;
+}
+
+
+/*for line chart of average votes*/
+svg#avgvotes body {
+  font: 10px sans-serif;
+}
+
+svg#avgvotes .axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+svg#avgvotes .x.axis path {
+  display: none;
+}
+
+svg#avgvotes .line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
 
 </style>
 
@@ -167,25 +222,6 @@ svg#barlength .x.axis path {
 
     </div>
 
-    <!-- <div class="row">
-
-        <div class="media-body" id="advanced">
-
-            <h2 class="page-header">Advanced Functionality</h2>
-
-            <p>Here is a description of the advanced functionality I implemented.</p>
-
-                <div id="block">
-                    <svg id="barlength" class="med" width="10" height="10"></svg>
-                    <svg id="avgvotes" class="medsmall" width="10" height="10"></svg>
-                    <svg id="barbudget" class="med" width="10" height="10"></svg>
-                    <svg id="avgrating" class="medsmall" width="10" height="10"></svg>
-                </div>
-
-        </div>
-
-    </div> -->
-
 </div>
 
 <div class="container">
@@ -249,13 +285,214 @@ d3.selectAll("svg.med")
 
 // select SVGs by Class using "."
 d3.selectAll("svg.medsmall")
+    .attr("background-color", "steelblue")
     .attr("width", 400)
     .attr("height", 225);
 
 
+// GROUPED BAR CHARTS - length by genre
+// http://bl.ocks.org/mbostock/3887051
+var marginbarl = {top: 20, right: 20, bottom: 30, left: 40},
+    widthbarl = 540 - marginbarl.left - marginbarl.right,
+    heightbarl = 225 - marginbarl.top - marginbarl.bottom;
+
+var x0barl = d3.scale.ordinal()
+    .rangeRoundBands([0, widthbarl], 0.05, 0.25);
+
+var x1barl = d3.scale.ordinal();
+
+var ybarl = d3.scale.linear()
+    .range([heightbarl, 0]).nice();
+
+var colorbarl = d3.scale.category10();
+
+var xAxisbarl = d3.svg.axis()
+    .scale(x0barl)
+    .orient("bottom");
+
+var yAxisbarl = d3.svg.axis()
+    .scale(ybarl)
+    .orient("left")
+    .tickFormat(d3.format("d"));    
+
+var svgbarl = d3.select("#barlength")
+  .append("g")
+    .attr("transform", "translate(" + marginbarl.left + "," + marginbarl.top + ")");
+
+d3.csv("genrebudgetlengths.csv", function(error, data) {
+  var yesnobarl = ["NonLength", "Length"]
+
+  data.forEach(function(d) {
+    d.genres = yesnobarl.map(function(name) { return {name: name, value: +d[name]}; });
+  });
+
+  x0barl.domain(data.map(function(d) { return d.Genre; }));
+  
+  x1barl.domain(yesnobarl)
+    .rangeRoundBands([0, x0barl.rangeBand()], 0.05, 0.25);
+
+  ybarl.domain([0, d3.max(data, function(d) { return d3.max(d.genres, function(d) { return d.value; }); }) + 30]).nice();
+
+  svgbarl.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + heightbarl + ")")
+      .call(xAxisbarl);
+
+  svgbarl.append("g")
+      .attr("class", "y axis")
+      .call(yAxisbarl)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .style("opacity", 0.7)
+      .text("length (in minutes)");
+
+  var genrebarl = svgbarl.selectAll(".genre")
+      .data(data)
+    .enter().append("g")
+      .attr("class", "g")
+      .attr("transform", function(d) { return "translate(" + x0barl(d.Genre) + ",0)"; });
+
+  genrebarl.selectAll("rect")
+      .data(function(d) { return d.genres; })
+    .enter().append("rect")
+      .attr("width", x1barl.rangeBand())
+      .attr("x", function(d) { return x1barl(d.name); })
+      .attr("y", function(d) { return ybarl(d.value); })
+      .attr("height", function(d) { return heightbarl - ybarl(d.value); })
+      .style("fill", function(d) { return colorbarl(d.name); });
+
+  var legendbarl = svgbarl.selectAll(".legend")
+      .data(yesnobarl.slice().reverse())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  legendbarl.append("rect")
+      .attr("x", widthbarl - 18)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", colorbarl);
+
+  legendbarl.append("text")
+      .attr("x", widthbarl - 24)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .style("opacity", 0.7)
+      .text(function(d) {
+        if (d == "Length") { return "Specified Genre"; }
+        else { return "Other Genres"; }
+      })
+
+
+});
+
+
+
+// GROUPED BAR CHARTS - budget by genre
+// http://bl.ocks.org/mbostock/3887051
+var marginbarb = {top: 20, right: 20, bottom: 30, left: 40},
+    widthbarb = 540 - marginbarb.left - marginbarb.right,
+    heightbarb = 225 - marginbarb.top - marginbarb.bottom;
+
+var x0barb = d3.scale.ordinal()
+    .rangeRoundBands([0, widthbarb], 0.05, 0.25);
+
+var x1barb = d3.scale.ordinal();
+
+var ybarb = d3.scale.linear()
+    .range([heightbarb, 0]).nice();
+
+var colorbarb = d3.scale.category10();
+
+var xAxisbarb = d3.svg.axis()
+    .scale(x0barb)
+    .orient("bottom");
+
+var yAxisbarb = d3.svg.axis()
+    .scale(ybarb)
+    .orient("left")
+    .tickFormat(d3.format(".2s"));
+
+var svgbarb = d3.select("#barbudget")
+  .append("g")
+    .attr("transform", "translate(" + marginbarb.left + "," + marginbarb.top + ")");
+
+d3.csv("genrebudgetlengths.csv", function(error, data) {
+  var yesnobarb = ["NonBudget", "Budget"]
+
+  data.forEach(function(d) {
+    d.budgets = yesnobarb.map(function(name) { return {name: name, value: +d[name]}; });
+  });
+
+  x0barb.domain(data.map(function(d) { return d.Genre; }));
+  
+  x1barb.domain(yesnobarb)
+    .rangeRoundBands([0, x0barb.rangeBand()], 0.05, 0.25);
+
+  ybarb.domain([0, d3.max(data, function(d) { return d3.max(d.budgets, function(d) { return d.value; }); })]).nice();
+
+  svgbarb.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + heightbarb + ")")
+      .call(xAxisbarb);
+
+  svgbarb.append("g")
+      .attr("class", "y axis")
+      .call(yAxisbarb)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .style("opacity", 0.7)
+      .text("budget (in dollars)");
+
+  var genrebarb = svgbarb.selectAll(".genre")
+      .data(data)
+    .enter().append("g")
+      .attr("class", "g")
+      .attr("transform", function(d) { return "translate(" + x0barb(d.Genre) + ",0)"; });
+
+  genrebarb.selectAll("rect")
+      .data(function(d) { return d.budgets; })
+    .enter().append("rect")
+      .attr("width", x1barb.rangeBand())
+      .attr("x", function(d) { return x1barb(d.name); })
+      .attr("y", function(d) { return ybarb(d.value); })
+      .attr("height", function(d) { return heightbarb - ybarb(d.value); })
+      .style("fill", function(d) { return colorbarb(d.name); });
+
+  var legendbarb = svgbarb.selectAll(".legend")
+      .data(yesnobarb.slice().reverse())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  legendbarb.append("rect")
+      .attr("x", widthbarb - 18)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", colorbarb);
+
+  legendbarb.append("text")
+      .attr("x", widthbarb - 24)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .style("opacity", 0.7)
+      .text(function(d) {
+        if (d == "Budget") { return "Specified Genre"; }
+        else { return "Other Genres"; }
+      })
+
+});
+
 
 // http://bl.ocks.org/mbostock/3883245
-// http://bl.ocks.org/mbostock/3887051
 
 
 </script>
