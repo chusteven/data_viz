@@ -173,7 +173,7 @@ svg#avgvotes .line {
 
             <h2 class="page-header">A Brief User Guide</h2>
 
-            <p>The following visualizations are somewhat straightforward in terms of how to interact with them. The basic visualization has simple honver-over options to display exact values. The moderate functionality has no interactivity, however.</p>
+            <p>The following visualizations are somewhat straightforward in terms of how to interact with them. The basic visualization has simple hover-over options to display exact values. The moderate functionality has no interactivity, however.</p>
 
         </div>
 
@@ -262,7 +262,7 @@ svg#avgvotes .line {
             
             <h2 class="page-header">Discussion</h1>
 
-            <p>I chose to visualize the information as presented above so as to capture information on a per-genre basis. For the two time-series plots, I wanted to break those line charts into multi-line charts - again, on a per-genre basis, with the added option of filtering. Furthermore, I chose to represent votes and ratings right above one another to make quick comparisons. There may have been a year that received a high average rating but had a relatively low average number of votes. I wanted to make these comparisons easy to make. As far as the grouped bar plots go, I chose the two colors so as to contrast the two groups.</p>
+            <p>I chose to visualize the information as presented above so as to capture information on a per-genre basis. For the two time-series plots, I wanted to break those line charts into multi-line charts - again, on a per-genre basis, with the added option of filtering, but did not have time. Furthermore, I chose to represent votes and ratings right above one another to make quick comparisons. For example, there may have been a year that received a high average rating but had a relatively low average number of votes. I wanted to make these comparisons easy to make. As far as the grouped bar plots go, I chose the two colors, orange and blue, so as to contrast the two groups.</p>
 
             <p>I think that my ultimate goal was to make all the graphs interact with each other. I was hoping that by selecting one genre at a time, I would be able to fade out all the other information on all the other graphs, so as to make quick comparisons between the various graphs. In any case, this is an opportunity I suppose I can explore another time.</p>
 
@@ -629,7 +629,6 @@ d3.csv("ratingvotesbyyear.csv", function(error, data) {
       .attr("class", "line")
       .attr("d", linelpr);
 });
-
 
 
 </script>
