@@ -127,33 +127,29 @@
 
 <script>
 
-/*
- * For sample TopoJSON files, go to:
- * https://gist.github.com/mbostock/4090846
- */
-
 var base = "https://gist.githubusercontent.com/mbostock/4090846/raw/";
 
+// this stuff is grabbing the necessary files off the internet at specified locations
 var url = {
     world: base + "world-50m.json",
     earthquakes: "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_month.csv"
 };
 
-// Uses reusable chart model
-// See http://bost.ocks.org/mike/chart/
+// uses reusable chart model
+// see http://bost.ocks.org/mike/chart/
 var chart = symbolMap();
 
-// Update how we access data (need the precip property)
+// update how we access data (need the precip property)
 chart = chart.value(function(d) { return d.mag; });
 
-// Nested calls to trigger drawing in proper order
+// nested calls to trigger drawing in proper order
 d3.json(url.world, function(mapError, mapJSON) {
     if (processError(mapError)) return;
 
     // update map data
     chart = chart.map(mapJSON);
 
-    // Wait until the map is drawn before loading
+    // wait until the map is drawn before loading
     // and drawing the data values
     d3.csv(url.earthquakes, function(dataError, dataJSON) {
         if (processError(dataError)) return;

@@ -1,22 +1,24 @@
 
-/*
- * If there is an error, insert an error message in the HTML
- * and log the error to the console.
- */
 
+var color = d3.scale.linear()
+    .range(["white", "blue"])
+    .interpolate(d3.interpolateLab);
+
+// if there is an error, insert an error message in the HTML
+// and log the error to the console.
 function processError(error) {
     if (error) {
-        // Use the "statusText" of the error if possible
+        // use the "statusText" of the error if possible
         var errorText = error.hasOwnProperty("statusText") ?
             error.statusText : error.toString();
 
-        // Insert the error message before all else
+        // insert the error message before all else
         d3.select("body")
             .insert("p", ":first-child")
             .text("Error: " + errorText)
             .style("color", "red");
 
-        // Log the error to the console
+        // log the error to the console
         console.warn(error);
         return true;
     }
@@ -26,32 +28,48 @@ function processError(error) {
 
 function symbolMap() {
 
+    // think about what exactly this is doing for us
     var lookup = {};
 
-    var projection = d3.geo.mercator();
+    // can choose a different kind of projection for sure
+    // var projection = d3.geo.mercator();
+    var projection = d3.geo.naturalEarth();
 
+    // this is for helping define the radius
     var radius = d3.scale.sqrt().range([5, 15]);
 
+    // not sure what this is for
     var log = d3.select("#log");
 
-    var map = null; // map data
-    var values = null; // values for symbols
+    // initializing these variables for later reference
+    var map = null;
+    var values = null;
 
     // gets the value property from the dataset
     // for our example, we need to reset this!
     var value = function(d) { return d.value; };
 
+    // for sorting the bubbles by size
+    function order(a, b) { return radius(value(b)) - radius(value(a)); }
+
+    // this initializes the chart or something
+    // 
     function chart(id) {
+
+        // this for debugging of sorts
         if (map === null || values === null) {
             console.warn("Unable to draw symbol map: missing data.");
             return;
         }
 
+        // drawing map message
         updateLog("Drawing map... please wait.");
 
+        // this is creating the svg object, as well as bounding box
         var svg = d3.select("svg#" + id);
         var bbox = svg.node().getBoundingClientRect();
 
+        // defining the projection as well as the repositioning of these things
         projection = d3.geo.naturalEarth()
                         .scale(167)
                         .translate([bbox.width / 2, bbox.height / 2])
@@ -60,10 +78,11 @@ function symbolMap() {
         // set path generator based on projection
         var path = d3.geo.path().projection(projection);
 
-        // update radius domain
+        // update radius domain as well as color domain
         // uses our value function to get the right property
+        // console.log(d3.extent(values, value));
         radius = radius.domain(d3.extent(values, value));
-        console.log(d3.extent(values, value));
+        color = color.domain(d3.extent(values, value));
 
         // create groups for each of our components
         // this just reduces our search time for specific states
@@ -98,6 +117,8 @@ function symbolMap() {
                 return projection([d.longitude, d.latitude])[1];
             })
             .classed({"symbol": true})
+            .style("fill", function(d) { return color(d.mag); })
+            .sort(order)
             .on("mouseover", showHighlight)
             .on("mouseout", hideHighlight);
     }
@@ -118,6 +139,7 @@ function symbolMap() {
 
     // gets/sets the mapping from state abbreviation to topojson id
     chart.lookup = function(_) {
+
         // if no arguments, return current value
         if (!arguments.length) {
             return lookup;
