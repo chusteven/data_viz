@@ -80,9 +80,9 @@ function symbolMap() {
 
         // update radius domain as well as color domain
         // uses our value function to get the right property
-        // console.log(d3.extent(values, value));
+        console.log(d3.extent(values, value));
         radius = radius.domain(d3.extent(values, value));
-        color = color.domain(d3.extent(values, value));
+        color = color.domain(d3.extent(values, function(d) { return d.depth }));
 
         // create groups for each of our components
         // this just reduces our search time for specific states
@@ -117,7 +117,7 @@ function symbolMap() {
                 return projection([d.longitude, d.latitude])[1];
             })
             .classed({"symbol": true})
-            .style("fill", function(d) { return color(d.mag); })
+            .style("fill", function(d) { return color(d.depth); })
             .sort(order)
             .on("mouseover", showHighlight)
             .on("mouseout", hideHighlight);
@@ -260,7 +260,7 @@ function symbolMap() {
                 "state": true
             });
 
-        updateLog(d.place + " got hit by a " + d.mag + " magnitude earthquake");
+        updateLog(d.place + " got hit by a " + d.mag + " magnitude earthquake with a depth of " + d.depth + " kilometers");
     }
 
     // called on mouseout
