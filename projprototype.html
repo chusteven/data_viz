@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>MSAN 622 Information Visualization</title>
+
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bootstrap-theme.min.css" rel="stylesheet">
+
+<style type="text/css">
+    body {
+        padding-top: 50px;
+        padding-bottom: 20px;
+    }
+</style>
+
+
+</head>
+
+<body>
+
+<!-- this is defining the style for the objects we will have populating our page -->
+<style>
+
+
+/*for bar chart of lengths*/
+svg#barlength body {
+  font: 10px sans-serif;
+}
+
+svg#barlength .axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+svg#barlength .axis text {
+    font-family: sans-serif;
+    font-size: 10px;
+}
+
+svg#barlength .bar {
+  fill: steelblue;
+}
+
+svg#barlength .x.axis path {
+  display: none;
+}
+
+
+/*for bar chart of budgets*/
+svg#barbudget body {
+  font: 10px sans-serif;
+}
+
+svg#barbudget .axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+svg#barbudget .axis text {
+    font-family: sans-serif;
+    font-size: 10px;
+}
+
+svg#barbudget .bar {
+  fill: steelblue;
+}
+
+svg#barbudget .x.axis path {
+  display: none;
+}
+
+
+/*for line chart of average rating*/
+svg#avgrating body {
+  font: 10px sans-serif;
+}
+
+svg#avgrating .axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+svg#avgrating .axis text {
+    font-family: sans-serif;
+    font-size: 10px;
+}
+
+svg#avgrating .line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+
+/*for line chart of average votes*/
+svg#avgvotes body {
+  font: 10px sans-serif;
+}
+
+svg#avgvotes .axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+svg#avgvotes .axis text {
+    font-family: sans-serif;
+    font-size: 10px;
+}
+
+svg#avgvotes .line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+</style>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle Navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">MSN 622</a>
+        </div>
+
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="#homework">Homework</a></li>
+                <li><a href="#project">Project</a></li>
+                <li><a href="#participation">Participation</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- title for homework -->
+    <div class="row" style="text-align:center;">
+        <h1>Final Project Prototype</h1>
+        <p>This page is for Steven Chu's final project prototype. Source code can be found in my <a href="https://github.com/chusteven/spring-2015-msan622/blob/gh-pages/projprototype.html">github respository</a>.</p>
+    </div>
+
+</div>
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="media-body" id="userguide">
+
+            <h2 class="page-header">A Brief User Guide</h2>
+
+            <p>A user guide for interactivity here (when it happens).</p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="media-body" id="moderate">
+
+            <h2 class="page-header">Prototype</h2>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="media-body" id="preprocessing">
+            
+            <h2 class="page-header">Pre-Processing</h1>
+
+            <p>Pre-processing here.</p>
+
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="media-body" id="discussion">
+            
+            <h2 class="page-header">Discussion</h1>
+
+            <p>Some kind of discussion over here.</p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<footer>
+    <p style="text-align: center;">Steven Chu &bullet; MSAN 622 Information Visualization &bullet; Spring 2015</p>
+</footer>
+
+</div>
+
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/d3.min.js"></script>
+
+<script>
+
+</script>
