@@ -1,8 +1,15 @@
 <!DOCTYPE html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <title>Symbol Map Demo</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>MSAN 622 Information Visualization</title>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">    
+    <link href="css/bootstrap-theme.min.css" rel="stylesheet">
 
     <!-- load D3 and TopoJSON //-->
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
@@ -10,23 +17,121 @@
     <script src="http://d3js.org/topojson.v1.min.js"></script>
 
     <!-- load custom CSS and JavaScript //-->
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
+    <link rel="stylesheet" href="stylemap.css">
+    <script src="scriptmap.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-top: 50px;
+            padding-bottom: 20px;
+        }
+    </style>
 
  </head>
 
 <body>
 
-<div id="block">
-<svg id="map" width="940" height="480"></svg>
-<p id="log">Loading map... please wait.</p>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle Navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">MSN 622</a>
+        </div>
+
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="#homework">Homework</a></li>
+                <li><a href="#project">Project</a></li>
+                <li><a href="#participation">Participation</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- title for homework -->
+    <div class="row" style="text-align:center;">
+        <h1>Homework 5: Earthquakes Visualization</h1>
+        <p>This page is for Steven Chu's fifth MSAN 622 homework assignment. Source code can be found in my <a href="https://github.com/chusteven/spring-2015-msan622/blob/gh-pages/homework5.html">github respository</a>.</p>
+    </div>
+
+</div>
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="media-body" id="userguide">
+
+            <h2 class="page-header">A Brief User Guide</h2>
+
+            <p>Shit here.</p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="container">
+
+    <div id="block">
+
+        <svg id="map" width="940" height="480"></svg>
+
+        <p id="log">Loading map... please wait.</p>
+
+    </div>
+
+</div>
+
+<div class="container">
+
+
+    <div class="row">
+
+        <div class="media-body" id="functionality">
+
+            <h2 class="page-header">Functionality</h2>
+
+            <p>For functionality things.</p>
+
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="media-body" id="moderate">
+
+            <h2 class="page-header">Discussion</h2>
+
+            <p>Discussion things here.</p>
+
+        </div>
+
+    </div>
+
 </div>
 
 <script>
+
 /*
  * For sample TopoJSON files, go to:
  * https://gist.github.com/mbostock/4090846
  */
+
 var base = "https://gist.githubusercontent.com/mbostock/4090846/raw/";
 
 var url = {
@@ -61,4 +166,5 @@ d3.json(url.world, function(mapError, mapJSON) {
 </script>
 
 </body>
+
 </html>
