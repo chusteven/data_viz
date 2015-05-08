@@ -26,104 +26,57 @@
 <!-- this is defining the style for the objects we will have populating our page -->
 <style>
 
-
-/*for bar chart of lengths*/
-svg#barlength body {
-  font: 10px sans-serif;
+/* for parallel plots */
+svg#pp {
+  font: 12px sans-serif;
 }
 
-svg#barlength .axis path,
-.axis line {
+svg#pp .background path {
   fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+  stroke: none;
+  stroke-width: 20px;
+  pointer-events: stroke;
 }
 
-svg#barlength .axis text {
-    font-family: sans-serif;
-    font-size: 10px;
-}
-
-svg#barlength .bar {
-  fill: steelblue;
-}
-
-svg#barlength .x.axis path {
-  display: none;
-}
-
-
-/*for bar chart of budgets*/
-svg#barbudget body {
-  font: 10px sans-serif;
-}
-
-svg#barbudget .axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-svg#barbudget .axis text {
-    font-family: sans-serif;
-    font-size: 10px;
-}
-
-svg#barbudget .bar {
-  fill: steelblue;
-}
-
-svg#barbudget .x.axis path {
-  display: none;
-}
-
-
-/*for line chart of average rating*/
-svg#avgrating body {
-  font: 10px sans-serif;
-}
-
-svg#avgrating .axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-svg#avgrating .axis text {
-    font-family: sans-serif;
-    font-size: 10px;
-}
-
-svg#avgrating .line {
+svg#pp .foreground path {
   fill: none;
   stroke: steelblue;
   stroke-width: 1.5px;
 }
 
-
-/*for line chart of average votes*/
-svg#avgvotes body {
-  font: 10px sans-serif;
+svg#pp .axis .title {
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
 }
 
-svg#avgvotes .axis path,
-.axis line {
+svg#pp .axis line, .axis path {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
 }
 
-svg#avgvotes .axis text {
-    font-family: sans-serif;
-    font-size: 10px;
+svg#pp .axis.string {
+  font-size: 6px;
 }
 
-svg#avgvotes .line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 1.5px;
+svg#pp .label {
+  -webkit-transition: fill 125ms linear;
+}
+
+svg#pp .active .label:not(.inactive) {
+  font-weight: bold;
+  font-size: 11px;
+}
+
+svg#pp .label.inactive {
+  fill: #ccc;
+}
+
+svg#pp .foreground path.inactive {
+  stroke: #ccc;
+  stroke-opacity: .5;
+  stroke-width: 1px;
 }
 
 </style>
@@ -185,9 +138,11 @@ svg#avgvotes .line {
 
     <div class="row">
 
-        <div class="media-body" id="moderate">
+        <div class="media-body" id="plots"></div>
 
             <h2 class="page-header">Prototype</h2>
+
+            <script type='text/javascript' src='https://public.tableau.com/javascripts/api/viz_v1.js'></script><div class='tableauPlaceholder' style='width: 654px; height: 742px;'><noscript><a href='#'><img alt='Dashboard 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;pr&#47;prototypes&#47;Dashboard1&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz' width='654' height='742' style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='site_root' value='' /><param name='name' value='prototypes&#47;Dashboard1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;pr&#47;prototypes&#47;Dashboard1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='showVizHome' value='no' /><param name='showTabs' value='y' /><param name='bootstrapWhenNotified' value='true' /></object></div>
 
         </div>
 
@@ -235,5 +190,166 @@ svg#avgvotes .line {
 <script src="js/d3.min.js"></script>
 
 <script>
+
+    // for A, plot parallel coordinates
+    // http://bl.ocks.org/syntagmatic/4020926
+    // code from http://bl.ocks.org/syntagmatic/4020926
+
+    // defining margins for this particular graph
+    var parallelMargin = {top: 30, right: 40, bottom: 20, left: 100},
+        parallelWidth = 1000 - parallelMargin.left - parallelMargin.right,
+        parallelHeight = 600 - parallelMargin.top - parallelMargin.bottom;
+
+    // define dimensions that i want to plot
+    var dimensions = [
+      {
+        name: "AGE2",
+        scale: d3.scale.ordinal().rangePoints([0, parallelHeight]),
+        type: "string"
+        // scale: d3.scale.linear().range([parallelHeight, 0]),
+        // type: "number"
+      },
+      {
+        name: "avgNervous",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "avgHopeless",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "avgRestless",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "avgSad",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "avgEffort",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "avgWorthless",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      }
+    ];
+
+    // defining x axis object
+    var xScaleParallel = d3.scale.ordinal()
+        .domain(dimensions.map(function(d) { return d.name; }))
+        .rangePoints([0, parallelWidth]);
+
+    // creating line function (?)
+    var line = d3.svg.line()
+        .defined(function(d) { return !isNaN(d[1]); });
+
+    // creating new y axis of sorts - want to know how exactly this interfaces with everything else
+    var yAxis2 = d3.svg.axis()
+        .orient("left");
+
+    // creating the parallel axes plot
+    var parallelChart = d3.select("#plots").append("svg")
+        .attr("id", "pp")
+        .attr("width", parallelWidth + parallelMargin.left + parallelMargin.right)
+        .attr("height", parallelHeight + parallelMargin.top + parallelMargin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + parallelMargin.left + "," + parallelMargin.top + ")");
+
+    // doing something about the dimensions
+    var dimension = parallelChart.selectAll(".dimension")
+        .data(dimensions)
+      .enter().append("g")
+        .attr("class", "dimension")
+        .attr("transform", function(d) { return "translate(" + xScaleParallel(d.name) + ")"; });
+
+    // actually reading in the data
+    d3.csv("question2.csv", function(data) {
+      dimensions.forEach(function(dimension) {
+        dimension.scale.domain(
+          dimension.type === "number"
+            ? [1,5]
+            : data.map(function(d) { return d[dimension.name]; }).sort());
+      });
+
+      // what's going on here?
+      parallelChart.append("g")
+          .attr("class", "background")
+        .selectAll("path")
+          .data(data)
+        .enter().append("path")
+          .attr("d", draw);
+
+      // and here?
+      parallelChart.append("g")
+          .attr("class", "foreground")
+        .selectAll("path")
+          .data(data)
+        .enter().append("path")
+          .attr("d", draw);
+
+      // and here?
+      dimension.append("g")
+          .attr("class", "axis")
+          .each(function(d) { d3.select(this).call(yAxis2.scale(d.scale)); })
+        .append("text")
+          .attr("class", "title")
+          .attr("text-anchor", "middle")
+          .attr("y", -9)
+          .text(function(d) { return d.name; });
+
+      // what is happening here? something about the ordinal labels?
+      var ordinal_labels = parallelChart.selectAll(".axis text")
+          .on("mouseover", mouseover)
+          .on("mouseout", mouseout);
+
+      // some kind of projection thing going on now
+      var projection = parallelChart.selectAll(".background path,.foreground path")
+          .on("mouseover", mouseover)
+          .on("mouseout", mouseout);
+
+      // moseover function
+      function mouseover(d) {
+        parallelChart.classed("active", true);
+
+        // this could be more elegant (?)
+        if (typeof d === "string") {
+          projection.classed("inactive", function(p) { return p.name !== d; });
+          projection.filter(function(p) { return p.name === d; }).each(moveToFront);
+          ordinal_labels.classed("inactive", function(p) { return p !== d; });
+          ordinal_labels.filter(function(p) { return p === d; }).each(moveToFront);
+        } else {
+          projection.classed("inactive", function(p) { return p !== d; });
+          projection.filter(function(p) { return p === d; }).each(moveToFront);
+          ordinal_labels.classed("inactive", function(p) { return p !== d.name; });
+          ordinal_labels.filter(function(p) { return p === d.name; }).each(moveToFront);
+        }
+      }
+
+      // mouseout function
+      function mouseout(d) {
+        parallelChart.classed("active", false);
+        projection.classed("inactive", false);
+        ordinal_labels.classed("inactive", false);
+      }
+
+      // what's going on here?
+      function moveToFront() {
+        this.parentNode.appendChild(this);
+      }
+    });
+
+    // and here?
+    function draw(d) {
+      return line(dimensions.map(function(dimension) {
+        return [xScaleParallel(dimension.name), dimension.scale(d[dimension.name])];
+      }));
+    }
 
 </script>
