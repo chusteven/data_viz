@@ -204,10 +204,10 @@ svg#pp .foreground path.inactive {
     var dimensions = [
       {
         name: "AGE2",
-        scale: d3.scale.ordinal().rangePoints([0, parallelHeight]),
-        type: "string"
-        // scale: d3.scale.linear().range([parallelHeight, 0]),
-        // type: "number"
+        // scale: d3.scale.ordinal().rangePoints([0, parallelHeight]),
+        // type: "string"
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
       },
       {
         name: "avgNervous",
@@ -273,9 +273,11 @@ svg#pp .foreground path.inactive {
     d3.csv("question2.csv", function(data) {
       dimensions.forEach(function(dimension) {
         dimension.scale.domain(
-          dimension.type === "number"
-            ? [1,5]
-            : data.map(function(d) { return d[dimension.name]; }).sort());
+          (dimension.type === "number" && dimension.name === "AGE2")
+            ? [7,17]
+            : [1,5]
+            // data.map(function(d) { return d[dimension.name]; }).sort()
+            );
       });
 
       // what's going on here?
