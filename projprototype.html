@@ -26,7 +26,7 @@
 <!-- this is defining the style for the objects we will have populating our page -->
 <style>
 
-/* for parallel plots */
+/* for parallel coordinates plots */
 svg#pp {
   font: 12px sans-serif;
 }
@@ -78,6 +78,37 @@ svg#pp .foreground path.inactive {
   stroke-opacity: .5;
   stroke-width: 1px;
 }
+
+
+
+
+
+
+/*for grouped bar plots*/
+svg#gbp body {
+  font: 10px sans-serif;
+}
+
+svg#gbp .axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+svg#gbp .axis text {
+    font-family: sans-serif;
+    font-size: 10px;
+}
+
+svg#gbp .bar {
+  fill: steelblue;
+}
+
+svg#gbp .x.axis path {
+  display: none;
+}
+
 
 </style>
 
@@ -191,7 +222,7 @@ svg#pp .foreground path.inactive {
 
 <script>
 
-    // for A, plot parallel coordinates
+    // for parallel coordinates
     // http://bl.ocks.org/syntagmatic/4020926
     // code from http://bl.ocks.org/syntagmatic/4020926
 
@@ -353,5 +384,207 @@ svg#pp .foreground path.inactive {
         return [xScaleParallel(dimension.name), dimension.scale(d[dimension.name])];
       }));
     }
+
+
+
+    // for grouped bar plot
+    // http://bl.ocks.org/mbostock/3887051
+    var gbpmargin = {top: 20, right: 20, bottom: 30, left: 40},
+        gbpwidth = 960 - gbpmargin.left - gbpmargin.right,
+        gbpheight = 500 - gbpmargin.top - gbpmargin.bottom;
+
+    var gbpx0 = d3.scale.ordinal()
+        .rangeRoundBands([0, gbpwidth], .1, .2);
+
+    var gbpx1 = d3.scale.ordinal();
+
+    var gbpy = d3.scale.linear()
+        .range([gbpheight, 0]).nice();
+
+    var gbpcolor = d3.scale.category10();
+
+    var gbpcolor = d3.scale.ordinal()
+        .range(["#98abc5", "#7b6888", "#a05d56", "#ff8c00"]);
+
+    var gbpxAxis = d3.svg.axis()
+        .scale(gbpx0)
+        .orient("bottom");
+
+    var gbpyAxis = d3.svg.axis()
+        .scale(gbpy)
+        .orient("left")
+        .tickFormat(d3.format(".2s"));
+
+    var gbpsvg = d3.select("#plots").append("svg")
+        .attr("id", "gbp")
+        .attr("width", gbpwidth + gbpmargin.left + gbpmargin.right)
+        .attr("height", gbpheight + gbpmargin.top + gbpmargin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + gbpmargin.left + "," + gbpmargin.top + ")");
+
+    d3.csv("alcbyincomerace.csv", function(error, data) {
+      // var gbpageNames = d3.keys(data[0]).filter(function(key) { return key !== "State"; });
+      
+      var gbpincomes = d3.keys(data[0]).filter(function(key) { return key !== "Race"; });
+
+      data.forEach(function(d) {
+        d.races = gbpincomes.map(function(name) { return {name: name, value: +d[name]}; });
+      });
+
+      gbpx0.domain(data.map(function(d) { return d["Race"]; }));
+      gbpx1.domain(gbpincomes).rangeRoundBands([0, gbpx0.rangeBand()]);
+      gbpy.domain([0, d3.max(data, function(d) { return d3.max(d.races, function(d) { return d.value; }); })]).nice();
+
+      gbpsvg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + gbpheight + ")")
+          .call(gbpxAxis)
+
+      gbpsvg.append("g")
+          .attr("class", "y axis")
+          .call(gbpyAxis)
+        .append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end")
+          .text("average number of days people had an alocholic beverage");
+
+      var gbpstate = gbpsvg.selectAll(".income")
+          .data(data)
+        .enter().append("g")
+          .attr("class", "g")
+          .attr("transform", function(d) { return "translate(" + gbpx0(d["Race"]) + ",0)"; });
+
+      gbpstate.selectAll("rect")
+          .data(function(d) { return d.races; })
+        .enter().append("rect")
+          .attr("width", gbpx1.rangeBand())
+          .attr("x", function(d) { return gbpx1(d.name); })
+          .attr("y", function(d) { return gbpy(d.value); })
+          .attr("height", function(d) { return gbpheight - gbpy(d.value); })
+          .style("fill", function(d) { return gbpcolor(d.name); });
+
+      var gbplegend = gbpsvg.selectAll(".legend")
+          .data(gbpincomes.slice().reverse())
+        .enter().append("g")
+          .attr("class", "legend")
+          .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+      gbplegend.append("rect")
+          .attr("x", gbpwidth - 18)
+          .attr("width", 18)
+          .attr("height", 18)
+          .style("fill", gbpcolor);
+
+      gbplegend.append("text")
+          .attr("x", gbpwidth - 24)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .style("font-size", "10px")
+          .style("text-anchor", "end")
+          .text(function(d) { return d; });
+
+
+    /*
+    // for grouped bar plot
+    var gbpmargin = {top: 20, right: 20, bottom: 30, left: 40},
+        gbpwidth = 960 - gbpmargin.left - gbpmargin.right,
+        gbpheight = 500 - gbpmargin.top - gbpmargin.bottom;
+
+    var gbpx0 = d3.scale.ordinal()
+        .rangeRoundBands([0, gbpwidth], .1);
+
+    var gbpx1 = d3.scale.ordinal();
+
+    var gbpy = d3.scale.linear()
+        .range([gbpheight, 0]).nice();
+
+    // var gbpcolor = d3.scale.category10();
+
+    var gbpcolor = d3.scale.ordinal()
+        .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+    var gbpxAxis = d3.svg.axis()
+        .scale(gbpx0)
+        .orient("bottom");
+
+    var gbpyAxis = d3.svg.axis()
+        .scale(gbpy)
+        .orient("left")
+        .tickFormat(d3.format(".2s"));
+
+    var gbpsvg = d3.select("#plots").append("svg")
+        .attr("id", "gbp")
+        .attr("width", gbpwidth + gbpmargin.left + gbpmargin.right)
+        .attr("height", gbpheight + gbpmargin.top + gbpmargin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + gbpmargin.left + "," + gbpmargin.top + ")");
+
+    d3.csv("alcbyincome.csv", function(error, data) {
+      // var gbpageNames = d3.keys(data[0]).filter(function(key) { return key !== "State"; });
+      
+      var gbpraces = d3.keys(data[0]).filter(function(key) { return key !== "Total Family Income"; });
+
+      data.forEach(function(d) {
+        d.incomes = gbpraces.map(function(name) { return {name: name, value: +d[name]}; });
+      });
+
+      gbpx0.domain(data.map(function(d) { return d["Total Family Income"]; }));
+      gbpx1.domain(gbpraces).rangeRoundBands([0, gbpx0.rangeBand()]);
+      gbpy.domain([0, d3.max(data, function(d) { return d3.max(d.incomes, function(d) { return d.value; }); })]).nice();
+
+      gbpsvg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + gbpheight + ")")
+          .call(gbpxAxis);
+
+      gbpsvg.append("g")
+          .attr("class", "y axis")
+          .call(gbpyAxis)
+        .append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end")
+          .text("average number of days had an alocholic beverage");
+
+      var gbpstate = gbpsvg.selectAll(".income")
+          .data(data)
+        .enter().append("g")
+          .attr("class", "g")
+          .attr("transform", function(d) { return "translate(" + gbpx0(d["Total Family Income"]) + ",0)"; });
+
+      gbpstate.selectAll("rect")
+          .data(function(d) { return d.incomes; })
+        .enter().append("rect")
+          .attr("width", gbpx1.rangeBand())
+          .attr("x", function(d) { return gbpx1(d.name); })
+          .attr("y", function(d) { return gbpy(d.value); })
+          .attr("height", function(d) { return gbpheight - gbpy(d.value); })
+          .style("fill", function(d) { return gbpcolor(d.name); });
+
+      var gbplegend = gbpsvg.selectAll(".legend")
+          .data(gbpraces.slice().reverse())
+        .enter().append("g")
+          .attr("class", "legend")
+          .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+      gbplegend.append("rect")
+          .attr("x", gbpwidth - 18)
+          .attr("width", 18)
+          .attr("height", 18)
+          .style("fill", gbpcolor);
+
+      gbplegend.append("text")
+          .attr("x", gbpwidth - 24)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .attr("font-size", "10px")
+          .style("text-anchor", "end")
+          .text(function(d) { return d; }); */
+
+    });
+
 
 </script>
