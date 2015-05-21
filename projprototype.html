@@ -110,6 +110,35 @@ svg#gbp .x.axis path {
 }
 
 
+
+
+
+/*for small multiples*/
+svg#sm body {
+  font: 10px sans-serif;
+}
+
+svg#sm .axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+svg#sm .axis text {
+    font-family: sans-serif;
+    font-size: 10px;
+}
+
+svg#sm .bar {
+  fill: steelblue;
+}
+
+svg#sm .x.axis path {
+  display: none;
+}
+
+
 </style>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -169,11 +198,26 @@ svg#gbp .x.axis path {
 
     <div class="row">
 
-        <div class="media-body" id="plots"></div>
+        <h2 class="page-header">Prototypes</h2>
 
-            <h2 class="page-header">Prototype</h2>
+        <p>A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here.</p>
 
-            <script type='text/javascript' src='https://public.tableau.com/javascripts/api/viz_v1.js'></script><div class='tableauPlaceholder' style='width: 654px; height: 742px;'><noscript><a href='#'><img alt='Dashboard 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;pr&#47;prototypes&#47;Dashboard1&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz' width='654' height='742' style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='site_root' value='' /><param name='name' value='prototypes&#47;Dashboard1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;pr&#47;prototypes&#47;Dashboard1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='showVizHome' value='no' /><param name='showTabs' value='y' /><param name='bootstrapWhenNotified' value='true' /></object></div>
+        <h3 class = "page-header">Parallel Coordinates Plot of Depression by Age</h3>
+        <div id="parallelcoordinates"></div>
+
+        <p>A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here.</p>
+
+        <h3 class = "page-header">Grouped Bar Chart of Alcohol Abuse by Race and Income</h3>
+        <div id="groupedbar"></div>
+
+        <p>A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here.</p>
+
+        <h3 class = "page-header">Small Multiples of Substance Use by Gender</h3>
+        <div id="smallmultiples"></div>
+
+        <p>A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here. A bunch of text here.</p>
+
+            <!-- <script type='text/javascript' src='https://public.tableau.com/javascripts/api/viz_v1.js'></script><div class='tableauPlaceholder' style='width: 654px; height: 742px;'><noscript><a href='#'><img alt='Dashboard 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;pr&#47;prototypes&#47;Dashboard1&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz' width='654' height='742' style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='site_root' value='' /><param name='name' value='prototypes&#47;Dashboard1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;pr&#47;prototypes&#47;Dashboard1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='showVizHome' value='no' /><param name='showTabs' value='y' /><param name='bootstrapWhenNotified' value='true' /></object></div> -->
 
         </div>
 
@@ -219,6 +263,7 @@ svg#gbp .x.axis path {
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/d3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.min.js"></script>
 
 <script>
 
@@ -286,7 +331,7 @@ svg#gbp .x.axis path {
         .orient("left");
 
     // creating the parallel axes plot
-    var parallelChart = d3.select("#plots").append("svg")
+    var parallelChart = d3.select("#parallelcoordinates").append("svg")
         .attr("id", "pp")
         .attr("width", parallelWidth + parallelMargin.left + parallelMargin.right)
         .attr("height", parallelHeight + parallelMargin.top + parallelMargin.bottom)
@@ -301,7 +346,7 @@ svg#gbp .x.axis path {
         .attr("transform", function(d) { return "translate(" + xScaleParallel(d.name) + ")"; });
 
     // actually reading in the data
-    d3.csv("question2.csv", function(data) {
+    d3.csv("depression.csv", function(data) {
       dimensions.forEach(function(dimension) {
         dimension.scale.domain(
           (dimension.type === "number" && dimension.name === "AGE2")
@@ -389,6 +434,8 @@ svg#gbp .x.axis path {
 
     // for grouped bar plot
     // http://bl.ocks.org/mbostock/3887051
+
+    // defining margins for this particular graph
     var gbpmargin = {top: 20, right: 20, bottom: 30, left: 40},
         gbpwidth = 960 - gbpmargin.left - gbpmargin.right,
         gbpheight = 500 - gbpmargin.top - gbpmargin.bottom;
@@ -400,8 +447,6 @@ svg#gbp .x.axis path {
 
     var gbpy = d3.scale.linear()
         .range([gbpheight, 0]).nice();
-
-    var gbpcolor = d3.scale.category10();
 
     var gbpcolor = d3.scale.ordinal()
         .range(["#98abc5", "#7b6888", "#a05d56", "#ff8c00"]);
@@ -415,7 +460,8 @@ svg#gbp .x.axis path {
         .orient("left")
         .tickFormat(d3.format(".2s"));
 
-    var gbpsvg = d3.select("#plots").append("svg")
+    // entire svg object that the graph lives in
+    var gbpsvg = d3.select("#groupedbar").append("svg")
         .attr("id", "gbp")
         .attr("width", gbpwidth + gbpmargin.left + gbpmargin.right)
         .attr("height", gbpheight + gbpmargin.top + gbpmargin.bottom)
@@ -435,6 +481,7 @@ svg#gbp .x.axis path {
       gbpx1.domain(gbpincomes).rangeRoundBands([0, gbpx0.rangeBand()]);
       gbpy.domain([0, d3.max(data, function(d) { return d3.max(d.races, function(d) { return d.value; }); })]).nice();
 
+      // each group is a set of bars
       gbpsvg.append("g")
           .attr("class", "x axis")
           .attr("transform", "translate(0," + gbpheight + ")")
@@ -450,12 +497,15 @@ svg#gbp .x.axis path {
           .style("text-anchor", "end")
           .text("average number of days people had an alocholic beverage");
 
+      // this creates all the bars at the same time
+      // shifts them accordingly
       var gbpstate = gbpsvg.selectAll(".income")
           .data(data)
         .enter().append("g")
           .attr("class", "g")
           .attr("transform", function(d) { return "translate(" + gbpx0(d["Race"]) + ",0)"; });
 
+      // makes it so that our rectangles are the correct dimensions and shit
       gbpstate.selectAll("rect")
           .data(function(d) { return d.races; })
         .enter().append("rect")
@@ -465,6 +515,7 @@ svg#gbp .x.axis path {
           .attr("height", function(d) { return gbpheight - gbpy(d.value); })
           .style("fill", function(d) { return gbpcolor(d.name); });
 
+      // going to create a new legend per...
       var gbplegend = gbpsvg.selectAll(".legend")
           .data(gbpincomes.slice().reverse())
         .enter().append("g")
@@ -485,106 +536,141 @@ svg#gbp .x.axis path {
           .style("text-anchor", "end")
           .text(function(d) { return d; });
 
+    });
 
-    /*
-    // for grouped bar plot
-    var gbpmargin = {top: 20, right: 20, bottom: 30, left: 40},
-        gbpwidth = 960 - gbpmargin.left - gbpmargin.right,
-        gbpheight = 500 - gbpmargin.top - gbpmargin.bottom;
 
-    var gbpx0 = d3.scale.ordinal()
-        .rangeRoundBands([0, gbpwidth], .1);
 
-    var gbpx1 = d3.scale.ordinal();
 
-    var gbpy = d3.scale.linear()
-        .range([gbpheight, 0]).nice();
+    // for small multiples graph
+    // http://bl.ocks.org/officeofjane/7315455
+    // http://bl.ocks.org/mbostock/3886208
 
-    // var gbpcolor = d3.scale.category10();
+    // defining margins
+    var marginsm = {top: 45, right: 100, bottom: 20, left: 30},
+        widthsm = 400 - marginsm.left - marginsm.right,
+        heightsm = 225 - marginsm.top - marginsm.bottom;
 
-    var gbpcolor = d3.scale.ordinal()
-        .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+    // this is for each different category i am assuming
+    var xsm = d3.scale.ordinal()
+        .rangeRoundBands([0, widthsm], .5);
 
-    var gbpxAxis = d3.svg.axis()
-        .scale(gbpx0)
+    // Scales. Note the inverted domain for y-scale: bigger is up!
+    var ysm = d3.scale.linear()
+        .range([heightsm, 0]);
+
+    // want a color per sex (in my situation)
+    var colorsm = d3.scale.ordinal()
+        .range(["#ff8c00", "#98abc5"]);
+
+    var xAxissm = d3.svg.axis()
+        .scale(xsm)
         .orient("bottom");
 
-    var gbpyAxis = d3.svg.axis()
-        .scale(gbpy)
+    var yAxissm = d3.svg.axis()
+        .scale(ysm)
         .orient("left")
-        .tickFormat(d3.format(".2s"));
+        .tickFormat(d3.format("s"));
 
-    var gbpsvg = d3.select("#plots").append("svg")
-        .attr("id", "gbp")
-        .attr("width", gbpwidth + gbpmargin.left + gbpmargin.right)
-        .attr("height", gbpheight + gbpmargin.top + gbpmargin.bottom)
-      .append("g")
-        .attr("transform", "translate(" + gbpmargin.left + "," + gbpmargin.top + ")");
-
-    d3.csv("alcbyincome.csv", function(error, data) {
-      // var gbpageNames = d3.keys(data[0]).filter(function(key) { return key !== "State"; });
-      
-      var gbpraces = d3.keys(data[0]).filter(function(key) { return key !== "Total Family Income"; });
+    // csv loaded asynchronously
+    d3.csv("substancebygender.csv", function(data) {
+      colorsm.domain(["Used", "Not Used"]);
 
       data.forEach(function(d) {
-        d.incomes = gbpraces.map(function(name) { return {name: name, value: +d[name]}; });
+          // console.log(d);
+          var y0 = 0;
+          d.used = colorsm.domain().map(function(name) { return {name: name, y0: y0, y1: y0 += +d[name]}; });
+          d.total = d.used[d.used.length - 1].y1;
+        });
+
+      data.sort(function(a, b) { return b.total - a.total; });
+
+      // Data is nested by country
+      var substances = d3.nest()
+          .key(function(d) {return d.Substance; })
+          .entries(data);
+
+      // Parse dates and numbers. We assume values are sorted by date.
+      // Also compute the maximum price per symbol, needed for the y-domain.
+      substances.forEach(function(s) {
+        s.values.forEach(function(d) { d["Used"] = +d["Used"]; d["Not Used"] = +d["Not Used"]; });
+        s.max = d3.max(s.values, function(d) { return d3.max([d["Used"], d["Not Used"]]); });
       });
 
-      gbpx0.domain(data.map(function(d) { return d["Total Family Income"]; }));
-      gbpx1.domain(gbpraces).rangeRoundBands([0, gbpx0.rangeBand()]);
-      gbpy.domain([0, d3.max(data, function(d) { return d3.max(d.incomes, function(d) { return d.value; }); })]).nice();
+      // Compute the minimum and maximum year and percent across symbols.
+      xsm.domain(data.map(function(d) { return d.Sex; }));
+      ysm.domain([0, d3.max(substances, function(s) { return s.max; })]).nice();
 
-      gbpsvg.append("g")
+      // Add an SVG element for each substance, with the desired dimensions and margin
+      // think about how this work with the current html i have going on...
+      var svgsm = d3.select("#smallmultiples").selectAll("svg")
+        .data(substances)
+        .enter()
+        .append("svg:svg")
+        .attr("id", "sm")
+        .attr("width", widthsm + marginsm.left + marginsm.right)
+        .attr("height", heightsm + marginsm.top + marginsm.bottom)
+      .append("g")
+        .attr("transform", "translate(" + marginsm.left + "," + marginsm.top + ")");
+
+      svgsm.append("g")
           .attr("class", "x axis")
-          .attr("transform", "translate(0," + gbpheight + ")")
-          .call(gbpxAxis);
+          .attr("transform", "translate(0," + heightsm + ")")
+          .call(xAxissm);
 
-      gbpsvg.append("g")
+      svgsm.append("g")
+          // hide y axis
           .attr("class", "y axis")
-          .call(gbpyAxis)
+          .call(yAxissm)
         .append("text")
-          .attr("transform", "rotate(-90)")
-          .attr("y", 6)
-          .attr("dy", ".71em")
-          .style("text-anchor", "end")
-          .text("average number of days had an alocholic beverage");
+        .attr("x", widthsm + 10)
+        .attr("y", heightsm/3)
+        .attr("dy", ".71em")
+        .attr("text-anchor", "start")
+        .attr("font-size", "12px")
+        .text(function(d) { return d.key});
 
-      var gbpstate = gbpsvg.selectAll(".income")
-          .data(data)
+      // Accessing nested data: https://groups.google.com/forum/#!topic/d3-js/kummm9mS4EA
+      // data(function(d) {return d.values;}) 
+      // this will dereference the values for nested data for each group
+      console.log(substances);
+
+      substance = svgsm.selectAll(".substance")
+          .data(function(d) {return d.values})
         .enter().append("g")
           .attr("class", "g")
-          .attr("transform", function(d) { return "translate(" + gbpx0(d["Total Family Income"]) + ",0)"; });
+          .attr("transform", function(d) { return "translate(" + xsm(d.Sex) + ",0)"; });
 
-      gbpstate.selectAll("rect")
-          .data(function(d) { return d.incomes; })
+      substance.selectAll("rect")
+          .data(function(d) { return d.used; })
         .enter().append("rect")
-          .attr("width", gbpx1.rangeBand())
-          .attr("x", function(d) { return gbpx1(d.name); })
-          .attr("y", function(d) { return gbpy(d.value); })
-          .attr("height", function(d) { return gbpheight - gbpy(d.value); })
-          .style("fill", function(d) { return gbpcolor(d.name); });
+          .attr("width", xsm.rangeBand())
+          .attr("y", function(d) { return ysm(d.y1); })
+          .attr("height", function(d) { return ysm(d.y0) - ysm(d.y1); })
+          .style("fill", function(d) { return colorsm(d.name); });
 
-      var gbplegend = gbpsvg.selectAll(".legend")
-          .data(gbpraces.slice().reverse())
+      var legend = svgsm.selectAll(".legend")
+          .data(colorsm.domain().slice().reverse())
         .enter().append("g")
           .attr("class", "legend")
           .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
-      gbplegend.append("rect")
-          .attr("x", gbpwidth - 18)
+      legend.append("rect")
+          .attr("x", widthsm - 18)
           .attr("width", 18)
           .attr("height", 18)
-          .style("fill", gbpcolor);
+          .style("fill", colorsm);
 
-      gbplegend.append("text")
-          .attr("x", gbpwidth - 24)
+      legend.append("text")
+          .attr("x", widthsm - 24)
           .attr("y", 9)
           .attr("dy", ".35em")
-          .attr("font-size", "10px")
+          .style("font-size", "10px")
           .style("text-anchor", "end")
-          .text(function(d) { return d; }); */
+          .text(function(d) { return d; });
 
     });
+
+
 
 
 </script>
