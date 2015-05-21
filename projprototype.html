@@ -560,7 +560,7 @@ svg#sm .x.axis path {
 
     // want a color per sex (in my situation)
     var colorsm = d3.scale.ordinal()
-        .range(["#ff8c00", "#98abc5"]);
+        .range(["#fc8d59", "#91bfdb"]);
 
     var xAxissm = d3.svg.axis()
         .scale(xsm)
@@ -576,7 +576,6 @@ svg#sm .x.axis path {
       colorsm.domain(["Used", "Not Used"]);
 
       data.forEach(function(d) {
-          // console.log(d);
           var y0 = 0;
           d.used = colorsm.domain().map(function(name) { return {name: name, y0: y0, y1: y0 += +d[name]}; });
           d.total = d.used[d.used.length - 1].y1;
@@ -593,8 +592,10 @@ svg#sm .x.axis path {
       // Also compute the maximum price per symbol, needed for the y-domain.
       substances.forEach(function(s) {
         s.values.forEach(function(d) { d["Used"] = +d["Used"]; d["Not Used"] = +d["Not Used"]; });
-        s.max = d3.max(s.values, function(d) { return d3.max([d["Used"], d["Not Used"]]); });
+        s.max = d3.max(s.values, function(d) { return d.total; });
       });
+
+      // console.log(substances);
 
       // Compute the minimum and maximum year and percent across symbols.
       xsm.domain(data.map(function(d) { return d.Sex; }));
@@ -612,13 +613,13 @@ svg#sm .x.axis path {
       .append("g")
         .attr("transform", "translate(" + marginsm.left + "," + marginsm.top + ")");
 
+
       svgsm.append("g")
           .attr("class", "x axis")
           .attr("transform", "translate(0," + heightsm + ")")
           .call(xAxissm);
 
       svgsm.append("g")
-          // hide y axis
           .attr("class", "y axis")
           .call(yAxissm)
         .append("text")
@@ -632,10 +633,10 @@ svg#sm .x.axis path {
       // Accessing nested data: https://groups.google.com/forum/#!topic/d3-js/kummm9mS4EA
       // data(function(d) {return d.values;}) 
       // this will dereference the values for nested data for each group
-      console.log(substances);
+      // console.log(substances);
 
       substance = svgsm.selectAll(".substance")
-          .data(function(d) {return d.values})
+          .data(function(d) { return d.values; })
         .enter().append("g")
           .attr("class", "g")
           .attr("transform", function(d) { return "translate(" + xsm(d.Sex) + ",0)"; });
@@ -669,6 +670,7 @@ svg#sm .x.axis path {
           .text(function(d) { return d; });
 
     });
+
 
 
 

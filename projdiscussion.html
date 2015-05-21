@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>MSAN 622 Information Visualization</title>
+
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bootstrap-theme.min.css" rel="stylesheet">
+
+<style type="text/css">
+    body {
+        padding-top: 50px;
+        padding-bottom: 20px;
+    }
+</style>
+
+
+</head>
+
+<body>
+
+<!-- this is defining the style for the objects we will have populating our page -->
+<style>
+
+</style>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle Navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">MSN 622</a>
+        </div>
+
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="#homework">Homework</a></li>
+                <li><a href="#project">Project</a></li>
+                <li><a href="#participation">Participation</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- title for project dataset site -->
+    <div class="row" style="text-align:center;">
+        <h1>Project Discussion</h1>
+        <p>This page is for Steven Chu's final project discussion in MSAN 622.</p>
+    </div>
+
+    <div class="row">
+        <h3>Techniques</h3>
+
+        <p>I plan on using R and Python to pre-process my data. I am imagining a lot of subsetting methods to get the data in the particular format I want it in for each different visualization. As far as D3 goes, I don't plan on needing to use any other libraries.</p>
+
+    </div>
+
+    <div class="row">
+        <h3>Interactivity</h3>
+
+        <p>The first visualization I plan on presenting will be a simple scatterplot. I am hoping to regress number of days in the past year in which a person has had an alcoholic beverage against that person's income. I will give each point a color representing that person's race, so as to capture that categorical information simultaneously. I am hoping to learn a bit about how income relates to alcohol consumption as well as how these things both individually and collectively relate to race.</p>
+
+        <p>The second visualization I plan to present will be a parallel coordinates plot. There will be a axis for each of the following variables: age as well as how often a person has felt nervous, hopeless, restless, sad, effortful, or worthless in the past 30 days of taking the survey. I will bucket age in a few different categories. The other variables are all rated on a scale ranging from "all of the time" to "none of the time." I am hoping to identify trends between age and various feelings of negativity, as well as trends between the various feelings of negativity.</p>
+
+        <p>My third visualization will be a small multiples chart. I will have a chart per major drug group. From there I will have a bar chart comparing the percentage of people who did versus did not partake of that particular substance. Each of those bars will further be broken down to compare the percentage of men versus women who fall into that particular category of did/did not partake. I am hoping to identify trends between how men and women abuse/do not abuse various substances.</p>
+
+    </div>
+
+    <div class="row">
+        <h3>Feedback</h3>
+
+        <p>For my first visualization, I want to be able to filter the scatterplot by race. I am thinking of radio buttons for this feature. If I am ambitious, I will use transitions to change the displayed y and x-axes. For the second visualization, I will have brushing so as to filter the data. For the third visualization, I will have details-on-demand using a tooltip object. This will be simply to provide more exact values for more accurate comparisons between groups.</p>
+
+    </div>    
+
+    <div class="row">
+        <h3>Challenges</h3>
+
+        <p>See below for a sketch of the planned interface.</p>
+
+    </div>
+
+    <div class="row">
+        <h3>Conclusions</h3>
+
+        <p>See below for a sketch of the planned interface.</p>
+
+    </div>
+
+</div>
+
+<footer>
+    <p style="text-align: center;">Steven Chu &bullet; MSAN 622 Information Visualization &bullet; Spring 2015</p>
+</footer>
+
+</div>
+
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/d3.min.js"></script>
+
+<!-- here is where all my Javascript goes -->
+<script>
+
+</script>
+
+
