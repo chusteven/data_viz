@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>MSAN 622 Information Visualization</title>
+
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bootstrap-theme.min.css" rel="stylesheet">
+
+<style type="text/css">
+    body {
+        padding-top: 50px;
+        padding-bottom: 20px;
+    }
+</style>
+
+
+</head>
+
+<body>
+
+<!-- this is defining the style for the objects we will have populating our page -->
+<style>
+
+/* for parallel coordinates plots */
+svg#pp {
+  font: 12px sans-serif;
+}
+
+svg#pp .background path {
+  fill: none;
+  stroke: none;
+  stroke-width: 20px;
+  pointer-events: stroke;
+}
+
+svg#pp .foreground path {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+svg#pp .axis .title {
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+svg#pp .axis line, .axis path {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+svg#pp .axis.string {
+  font-size: 6px;
+}
+
+svg#pp .label {
+  -webkit-transition: fill 125ms linear;
+}
+
+svg#pp .active .label:not(.inactive) {
+  font-weight: bold;
+  font-size: 11px;
+}
+
+svg#pp .label.inactive {
+  fill: #ccc;
+}
+
+svg#pp .foreground path.inactive {
+  stroke: #ccc;
+  stroke-opacity: .5;
+  stroke-width: 1px;
+}
+
+
+
+
+
+
+/*for grouped bar plots*/
+svg#gbp body {
+  font: 10px sans-serif;
+}
+
+svg#gbp .axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+svg#gbp .axis text {
+    font-family: sans-serif;
+    font-size: 10px;
+}
+
+svg#gbp .bar {
+  fill: steelblue;
+}
+
+svg#gbp .x.axis path {
+  display: none;
+}
+
+
+
+
+
+/*for small multiples*/
+svg#sm body {
+  font: 10px sans-serif;
+}
+
+svg#sm .axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+svg#sm .axis text {
+    font-family: sans-serif;
+    font-size: 10px;
+}
+
+svg#sm .bar {
+  fill: steelblue;
+}
+
+svg#sm .x.axis path {
+  display: none;
+}
+
+
+</style>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle Navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">MSN 622</a>
+        </div>
+
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="#homework">Homework</a></li>
+                <li><a href="#project">Project</a></li>
+                <li><a href="#participation">Participation</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- title for homework -->
+    <div class="row" style="text-align:center;">
+        <h1>Final Project</h1>
+        <p>This page is for Steven Chu's final project. Source code can be found in my <a href="https://github.com/chusteven/spring-2015-msan622/">github respository</a>.</p>
+    </div>
+
+</div>
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="media-body" id="preprocessing">
+            
+            <h2 class="page-header">Pre-Processing</h1>
+
+            <p>I used R to subset the entire dataset down to only the columns for which I was interested. From there, I used MySQL to run aggregate as well as subsetting functions to grab the data in the format needed for my visualizations. I used Excel to format things in the manner in which I needed them.</p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="media-body" id="userguide">
+
+            <h2 class="page-header">A Brief User Guide & The Visualizations</h2>
+
+            <p>Most of the visualizations below are not interactive. The parallel coordinates plot, however, is. You can see what the average depression metrics are for selected age groups simply by mousing over each line.</p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="container">
+
+    <div class="row">
+
+        <h3 class = "page-header">Parallel Coordinates Plot of Depression by Age</h3>
+
+        <p>The following visualization is supposed to be a reflection of how age affects depression. The age coordinate is coded as follows:</p>
+
+        <li>17 represents people who are 65 or older</li>
+        <li>16 represents people who are between 50 and 64</li>
+        <li>15 represents people who are between 35 and 49</li>
+        <li>14 represents people who are between 30 and 34</li>
+        <li>13 represents people who are between 26 and 29</li>
+        <li>12 represents people who are 24 or 25</li>
+        <li>11 represents people who are 22 or 23</li>
+        <li>10 represents people who are 21</li>
+        <li>9 represents people who are 20</li>
+        <li>8 represents people who are 19</li>
+        <li>7 represents people who are 18</li>
+
+        <br>
+
+        <p>The rest of the coordinates represent peoples' responses to the following question: "In the past 30 days, how often have you felt: (the variables are coded as follow below)</p>
+
+        <li>AVGNERVOUS represents feeling nervous</li>
+        <li>AVGHOPELESS represents feeling hopeless</li>
+        <li>AVGRESTLESS represents feeling restless</li>
+        <li>AVGSAD represents feeling so sad that nothing could cheer that person up</li>
+        <li>AVGEFFORT represents feeling like everything is an effort</li>
+        <li>AVGWORTHLESS represents feeling worthless</li>
+
+        <br>
+
+        <p>Additionally, the responses were coded from 1 (representing I feel this way all the time) to 5 (I feel this way none of the time). As you should be able to see, the older people get, the less depressive they tend to be.</p>
+
+        <div id="parallelcoordinates"></div>
+
+        <h3 class = "page-header">Grouped Bar Chart of Alcohol Abuse by Race and Income</h3>
+
+        <p>The following visualization looks at the average number of days a person following into the following categories (race and income level) has had a drink in the past year. NB: income is not personal income, but rather, total family income. As you should be able to see, income doesn't necessarily have a huge effect of number of days a person has had an alcoholic beverage. Between the races, however, there are some notable trends such as Asians having less to drink overall than, say, Native HI/Other Pacific Islanders.</p>
+
+        <div id="groupedbar"></div>
+
+        <h3 class = "page-header">Small Multiples of Substance Use by Gender</h3>
+
+        <p>The following plot represents a look at many different substances and whether or not people (broken into gender) have tried that substance or not. As you should be able to see, there doesn't appear to be any serious deviations in how men or women use or don't use certain substances.</p>
+
+        <div id="smallmultiples"></div>
+
+            <!-- <script type='text/javascript' src='https://public.tableau.com/javascripts/api/viz_v1.js'></script><div class='tableauPlaceholder' style='width: 654px; height: 742px;'><noscript><a href='#'><img alt='Dashboard 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;pr&#47;prototypes&#47;Dashboard1&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz' width='654' height='742' style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='site_root' value='' /><param name='name' value='prototypes&#47;Dashboard1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;pr&#47;prototypes&#47;Dashboard1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='showVizHome' value='no' /><param name='showTabs' value='y' /><param name='bootstrapWhenNotified' value='true' /></object></div> -->
+
+        </div>
+
+    </div>
+
+</div>
+
+<br>
+<br>
+
+<div class="container">
+
+    <!-- title for project dataset site -->
+    <div class="row" style="text-align:center;">
+        <h1>Project Discussion</h1>
+    </div>
+
+    <div class="row">
+        <h3>Techniques</h3>
+
+        <p>For my parallel coordinates plot, I encoded the data by looking at average responses to each of the questions regarding depression. My hopes were to understand how age affects mental health. In general, I wanted for my age variable to be ordered, as well as each of the responses. This way, the user would be drawn to the natural progression of the responses from less depressive (older folks) to more depressive (younger folks). There is no lie-factor, the data-density is strong, but the data-ink ratio is a bit off. As far as this last point goes, I think I could have achieved the same effect in a multi-line chart, though I would've faced similar issues of ordering the varibles. This is why, ultimately, I chose to encode the data in a parallel coordinates plot.</p>
+
+        <p>For my grouped bar chart, I encoded the data by looking at average number of days with a drink by each different grouping. My hopes were to understand, at once, trends in alcohol abuse by both race and income level. Where this visualization fails is in normalization. For example, there were many more White people sampled than there were Native Americans. In general, I was hoping to draw the user's attention to the coloring of the income brackets. I was hoping to see that richer people drink more, thus coloring their bars orange. There is no lie-factor, the data-density is strong, and the data-ink ratio is solid too. As I wanted to make multiple comparisons for simple aggregate measures, I felt as though a bar chart was both the simplest and most informative.</p>
+
+        <p>For my small multiples plot, I encoded the data by looking at individual responses to men and women who have or have not partaken of a particular substance. I wanted to see whether men or women abuse certain substances more and if so, which group does so. I encoded the used versus not-used classes by the colors light blue and orange to suggest that people who used were a bit "bolder," so to speak. Where this visualization fails is in not showing things as relatively as possible. I tried my hardest to get each small multiple to rescale, but was not successful. There is no lie-factor, the data-density is okay (except for the last few graphs in which the scale is so far off that hardly any data is being displayed), and the data-ink ratio is solid. As I wanted to make comparisons between men and women mostly, but also for users and non-users, I knew a stacked bar chart would achieve that the best.</p>
+
+    </div>
+
+    <div class="row">
+        <h3>Interactivity</h3>
+
+        <p>Ultimately, I was not able to implement much interactivity. If I were to, details-on-demand would perhaps be the most useful to make more accurate comparisons. As it stands, I was really only trying to see general trends in my data. To this point, having interactivity was not as necessary. I think were I to implement certain features, perhaps I would have chosen to implement focus+context to overcome issues of data-density or bad data-ink ratio.</p>
+
+    </div>
+
+    <div class="row">
+        <h3>Feedback</h3>
+
+        <p>My classmates were greatly helpful in discussing how I could answer the questions I was trying to answer. For the most part, they told me not to worry about what I would or would not find and just to get into the data and make my visualization first before stressing about what I would find. They made strong suggestions to run simple aggregate functions to see the trends between the various groups at which I wanted to look.</p>
+
+    </div>    
+
+    <div class="row">
+        <h3>Challenges</h3>
+
+        <p>For the parallel coordinates plot, the main challenge surfaced when I first tried to do this visualization not as aggregated plot but simply with the raw data. I ended up with a lattice-like plot because all combinations of these discrete variables were met, as the data consists of over 55,000 rows. I was hoping not to have to aggregate, but this is the shortcoming of a parallel coordinates plot consisting only of discrete data, I suppose.</p>
+
+        <p>For the grouped bar chart, the biggest challenge I faced was in not normalizing my data. If I had planned ahead better, perhaps I would have thought to bootstrap my data from the smaller groups upward, but did not. In general, however, I'm quite satisfied with this visualization as it does a decent job showing the difference between the races. Perhaps I need to spend some time focusing more on my original question of whether or not there are difference in how alcohol is abused based on income. But even then, it's possible to see some minute trends - at least within a race.</p>
+
+        <p>The my small multiples plot, I really tried my best to rescale each small multiple's y-axis based on that particular substance's maximum value. I ran into a lot of issues with how JavaScript structures its data, however. For this reason, I was unsuccessful in my endeavors. Furthermore, it was quite a challenge to even figure out that rather than another grouped bar chart, I could simply stack my bars. Lastly, figuring out how to extend the examples I found on Michael Bostock's website to my own particular example took a lot of fooling around with the data structure. Eventually, through lots of console logs, I figured it out though.</p>
+
+    </div>
+
+    <div class="row">
+        <h3>Conclusions</h3>
+
+        <p>This was a tough project for me. I had great ideas about what I wanted to find in the dataset, but the amount of time needed to figure out how exactly I would do everything I wanted to (looking at alcohol abuse by both race and income, or looking at mental health as a general idea versus age) required me to make more compromises that I had originally planned. Though I'm satisfied with what I've produced so far, I think that given more time I would have liked to pare down the scale of each of my questions.</p>
+
+        <p>What I did learn from my visualizations, however, are the following tidbits:</p>
+
+        <li>Older people tend to be more mentally and emotionally stable than younger people. This is good news for a young person like myself.</li>
+        <li>Asian people have a lot less alcohol than people of other races. It might be the case that richer people drink more than poorer people, but it might also be a statistical aberration based on our sampling.</li>
+        <li>Men and women tend to use/not use substances equally. I had originally thought that men might abuse harsher substances in droves more than women, but as it turns out people who use substances abuse them regardless of their sex, while people who don't use substances don't use them regardless of their sex as well.</li>
+
+    </div>
+
+</div>
+
+<br>
+
+<footer>
+    <p style="text-align: center;">Steven Chu &bullet; MSAN 622 Information Visualization &bullet; Spring 2015</p>
+</footer>
+
+</div>
+
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/d3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.min.js"></script>
+
+<script>
+
+    // for parallel coordinates
+    // http://bl.ocks.org/syntagmatic/4020926
+    // code from http://bl.ocks.org/syntagmatic/4020926
+
+    // defining margins for this particular graph
+    var parallelMargin = {top: 30, right: 40, bottom: 20, left: 100},
+        parallelWidth = 1000 - parallelMargin.left - parallelMargin.right,
+        parallelHeight = 600 - parallelMargin.top - parallelMargin.bottom;
+
+    // define dimensions that i want to plot
+    var dimensions = [
+      {
+        name: "AGE2",
+        // scale: d3.scale.ordinal().rangePoints([0, parallelHeight]),
+        // type: "string"
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "avgNervous",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "avgHopeless",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "avgRestless",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "avgSad",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "avgEffort",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      },
+      {
+        name: "avgWorthless",
+        scale: d3.scale.linear().range([parallelHeight, 0]),
+        type: "number"
+      }
+    ];
+
+    // defining x axis object
+    var xScaleParallel = d3.scale.ordinal()
+        .domain(dimensions.map(function(d) { return d.name; }))
+        .rangePoints([0, parallelWidth]);
+
+    // creating line function (?)
+    var line = d3.svg.line()
+        .defined(function(d) { return !isNaN(d[1]); });
+
+    // creating new y axis of sorts - want to know how exactly this interfaces with everything else
+    var yAxis2 = d3.svg.axis()
+        .orient("left");
+
+    // creating the parallel axes plot
+    var parallelChart = d3.select("#parallelcoordinates").append("svg")
+        .attr("id", "pp")
+        .attr("width", parallelWidth + parallelMargin.left + parallelMargin.right)
+        .attr("height", parallelHeight + parallelMargin.top + parallelMargin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + parallelMargin.left + "," + parallelMargin.top + ")");
+
+    // doing something about the dimensions
+    var dimension = parallelChart.selectAll(".dimension")
+        .data(dimensions)
+      .enter().append("g")
+        .attr("class", "dimension")
+        .attr("transform", function(d) { return "translate(" + xScaleParallel(d.name) + ")"; });
+
+    // actually reading in the data
+    d3.csv("depression.csv", function(data) {
+      dimensions.forEach(function(dimension) {
+        dimension.scale.domain(
+          (dimension.type === "number" && dimension.name === "AGE2")
+            ? [7,17]
+            : [1,5]
+            // data.map(function(d) { return d[dimension.name]; }).sort()
+            );
+      });
+
+      // what's going on here?
+      parallelChart.append("g")
+          .attr("class", "background")
+        .selectAll("path")
+          .data(data)
+        .enter().append("path")
+          .attr("d", draw);
+
+      // and here?
+      parallelChart.append("g")
+          .attr("class", "foreground")
+        .selectAll("path")
+          .data(data)
+        .enter().append("path")
+          .attr("d", draw);
+
+      // and here?
+      dimension.append("g")
+          .attr("class", "axis")
+          .each(function(d) { d3.select(this).call(yAxis2.scale(d.scale)); })
+        .append("text")
+          .attr("class", "title")
+          .attr("text-anchor", "middle")
+          .attr("y", -9)
+          .text(function(d) { return d.name; });
+
+      // what is happening here? something about the ordinal labels?
+      var ordinal_labels = parallelChart.selectAll(".axis text")
+          .on("mouseover", mouseover)
+          .on("mouseout", mouseout);
+
+      // some kind of projection thing going on now
+      var projection = parallelChart.selectAll(".background path,.foreground path")
+          .on("mouseover", mouseover)
+          .on("mouseout", mouseout);
+
+      // moseover function
+      function mouseover(d) {
+        parallelChart.classed("active", true);
+
+        // this could be more elegant (?)
+        if (typeof d === "string") {
+          projection.classed("inactive", function(p) { return p.name !== d; });
+          projection.filter(function(p) { return p.name === d; }).each(moveToFront);
+          ordinal_labels.classed("inactive", function(p) { return p !== d; });
+          ordinal_labels.filter(function(p) { return p === d; }).each(moveToFront);
+        } else {
+          projection.classed("inactive", function(p) { return p !== d; });
+          projection.filter(function(p) { return p === d; }).each(moveToFront);
+          ordinal_labels.classed("inactive", function(p) { return p !== d.name; });
+          ordinal_labels.filter(function(p) { return p === d.name; }).each(moveToFront);
+        }
+      }
+
+      // mouseout function
+      function mouseout(d) {
+        parallelChart.classed("active", false);
+        projection.classed("inactive", false);
+        ordinal_labels.classed("inactive", false);
+      }
+
+      // what's going on here?
+      function moveToFront() {
+        this.parentNode.appendChild(this);
+      }
+    });
+
+    // and here?
+    function draw(d) {
+      return line(dimensions.map(function(dimension) {
+        return [xScaleParallel(dimension.name), dimension.scale(d[dimension.name])];
+      }));
+    }
+
+
+
+    // for grouped bar plot
+    // http://bl.ocks.org/mbostock/3887051
+
+    // defining margins for this particular graph
+    var gbpmargin = {top: 20, right: 20, bottom: 30, left: 40},
+        gbpwidth = 960 - gbpmargin.left - gbpmargin.right,
+        gbpheight = 500 - gbpmargin.top - gbpmargin.bottom;
+
+    var gbpx0 = d3.scale.ordinal()
+        .rangeRoundBands([0, gbpwidth], .1, .2);
+
+    var gbpx1 = d3.scale.ordinal();
+
+    var gbpy = d3.scale.linear()
+        .range([gbpheight, 0]).nice();
+
+    var gbpcolor = d3.scale.ordinal()
+        .range(["#98abc5", "#7b6888", "#a05d56", "#ff8c00"]);
+
+    var gbpxAxis = d3.svg.axis()
+        .scale(gbpx0)
+        .orient("bottom");
+
+    var gbpyAxis = d3.svg.axis()
+        .scale(gbpy)
+        .orient("left")
+        .tickFormat(d3.format(".2s"));
+
+    // entire svg object that the graph lives in
+    var gbpsvg = d3.select("#groupedbar").append("svg")
+        .attr("id", "gbp")
+        .attr("width", gbpwidth + gbpmargin.left + gbpmargin.right)
+        .attr("height", gbpheight + gbpmargin.top + gbpmargin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + gbpmargin.left + "," + gbpmargin.top + ")");
+
+    d3.csv("alcbyincomerace.csv", function(error, data) {
+      // var gbpageNames = d3.keys(data[0]).filter(function(key) { return key !== "State"; });
+      
+      var gbpincomes = d3.keys(data[0]).filter(function(key) { return key !== "Race"; });
+
+      data.forEach(function(d) {
+        d.races = gbpincomes.map(function(name) { return {name: name, value: +d[name]}; });
+      });
+
+      gbpx0.domain(data.map(function(d) { return d["Race"]; }));
+      gbpx1.domain(gbpincomes).rangeRoundBands([0, gbpx0.rangeBand()]);
+      gbpy.domain([0, d3.max(data, function(d) { return d3.max(d.races, function(d) { return d.value; }); })]).nice();
+
+      // each group is a set of bars
+      gbpsvg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + gbpheight + ")")
+          .call(gbpxAxis)
+
+      gbpsvg.append("g")
+          .attr("class", "y axis")
+          .call(gbpyAxis)
+        .append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end")
+          .text("average number of days people had an alocholic beverage");
+
+      // this creates all the bars at the same time
+      // shifts them accordingly
+      var gbpstate = gbpsvg.selectAll(".income")
+          .data(data)
+        .enter().append("g")
+          .attr("class", "g")
+          .attr("transform", function(d) { return "translate(" + gbpx0(d["Race"]) + ",0)"; });
+
+      // makes it so that our rectangles are the correct dimensions and shit
+      gbpstate.selectAll("rect")
+          .data(function(d) { return d.races; })
+        .enter().append("rect")
+          .attr("width", gbpx1.rangeBand())
+          .attr("x", function(d) { return gbpx1(d.name); })
+          .attr("y", function(d) { return gbpy(d.value); })
+          .attr("height", function(d) { return gbpheight - gbpy(d.value); })
+          .style("fill", function(d) { return gbpcolor(d.name); });
+
+      // going to create a new legend per...
+      var gbplegend = gbpsvg.selectAll(".legend")
+          .data(gbpincomes.slice().reverse())
+        .enter().append("g")
+          .attr("class", "legend")
+          .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+      gbplegend.append("rect")
+          .attr("x", gbpwidth - 18)
+          .attr("width", 18)
+          .attr("height", 18)
+          .style("fill", gbpcolor);
+
+      gbplegend.append("text")
+          .attr("x", gbpwidth - 24)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .style("font-size", "10px")
+          .style("text-anchor", "end")
+          .text(function(d) { return d; });
+
+    });
+
+
+
+
+    // for small multiples graph
+    // http://bl.ocks.org/officeofjane/7315455
+    // http://bl.ocks.org/mbostock/3886208
+
+    // defining margins
+    var marginsm = {top: 45, right: 100, bottom: 20, left: 30},
+        widthsm = 400 - marginsm.left - marginsm.right,
+        heightsm = 225 - marginsm.top - marginsm.bottom;
+
+    // this is for each different category i am assuming
+    var xsm = d3.scale.ordinal()
+        .rangeRoundBands([0, widthsm], .5);
+
+    // Scales. Note the inverted domain for y-scale: bigger is up!
+    var ysm = d3.scale.linear()
+        .range([heightsm, 0]);
+
+    // want a color per sex (in my situation)
+    var colorsm = d3.scale.ordinal()
+        .range(["#fc8d59", "#91bfdb"]);
+
+    var xAxissm = d3.svg.axis()
+        .scale(xsm)
+        .orient("bottom");
+
+    var yAxissm = d3.svg.axis()
+        .scale(ysm)
+        .orient("left")
+        .tickFormat(d3.format("s"));
+
+    // csv loaded asynchronously
+    d3.csv("substancebygender.csv", function(data) {
+      colorsm.domain(["Used", "Not Used"]);
+
+      data.forEach(function(d) {
+          var y0 = 0;
+          d.used = colorsm.domain().map(function(name) { return {name: name, y0: y0, y1: y0 += +d[name]}; });
+          d.total = d.used[d.used.length - 1].y1;
+        });
+
+      data.sort(function(a, b) { return b.total - a.total; });
+
+      // Data is nested by country
+      var substances = d3.nest()
+          .key(function(d) {return d.Substance; })
+          .entries(data);
+
+      // Parse dates and numbers. We assume values are sorted by date.
+      // Also compute the maximum price per symbol, needed for the y-domain.
+      substances.forEach(function(s) {
+        s.values.forEach(function(d) { d["Used"] = +d["Used"]; d["Not Used"] = +d["Not Used"]; });
+        s.max = d3.max(s.values, function(d) { return d.total; });
+      });
+
+      // console.log(substances);
+
+      // Compute the minimum and maximum year and percent across symbols.
+      xsm.domain(data.map(function(d) { return d.Sex; }));
+      ysm.domain([0, d3.max(substances, function(s) { return s.max; })]).nice();
+
+      // Add an SVG element for each substance, with the desired dimensions and margin
+      // think about how this work with the current html i have going on...
+      var svgsm = d3.select("#smallmultiples").selectAll("svg")
+        .data(substances)
+        .enter()
+        .append("svg:svg")
+        .attr("id", "sm")
+        .attr("width", widthsm + marginsm.left + marginsm.right)
+        .attr("height", heightsm + marginsm.top + marginsm.bottom)
+      .append("g")
+        .attr("transform", "translate(" + marginsm.left + "," + marginsm.top + ")");
+
+
+      svgsm.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + heightsm + ")")
+          .call(xAxissm);
+
+      svgsm.append("g")
+          .attr("class", "y axis")
+          .call(yAxissm)
+        .append("text")
+        .attr("x", widthsm + 10)
+        .attr("y", heightsm/3)
+        .attr("dy", ".71em")
+        .attr("text-anchor", "start")
+        .attr("font-size", "12px")
+        .text(function(d) { return d.key});
+
+      // Accessing nested data: https://groups.google.com/forum/#!topic/d3-js/kummm9mS4EA
+      // data(function(d) {return d.values;}) 
+      // this will dereference the values for nested data for each group
+      // console.log(substances);
+
+      substance = svgsm.selectAll(".substance")
+          .data(function(d) { return d.values; })
+        .enter().append("g")
+          .attr("class", "g")
+          .attr("transform", function(d) { return "translate(" + xsm(d.Sex) + ",0)"; });
+
+      substance.selectAll("rect")
+          .data(function(d) { return d.used; })
+        .enter().append("rect")
+          .attr("width", xsm.rangeBand())
+          .attr("y", function(d) { return ysm(d.y1); })
+          .attr("height", function(d) { return ysm(d.y0) - ysm(d.y1); })
+          .style("fill", function(d) { return colorsm(d.name); });
+
+      var legend = svgsm.selectAll(".legend")
+          .data(colorsm.domain().slice().reverse())
+        .enter().append("g")
+          .attr("class", "legend")
+          .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+      legend.append("rect")
+          .attr("x", widthsm - 18)
+          .attr("width", 18)
+          .attr("height", 18)
+          .style("fill", colorsm);
+
+      legend.append("text")
+          .attr("x", widthsm - 24)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .style("font-size", "10px")
+          .style("text-anchor", "end")
+          .text(function(d) { return d; });
+
+    });
+
+
+
+
+
+</script>
